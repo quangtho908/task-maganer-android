@@ -41,7 +41,7 @@ public class LoginAndSignUp extends AppCompatActivity {
     float v = 0;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
-    final String default_web_client_id = "426645351295-9bo4evej8ape3pjiqa8nvr1f43lmvb92.apps.googleusercontent.com";
+    final String default_web_client_id = "82519232310-nq46gdti6af4qtui3dfl4hif6vmrquur.apps.googleusercontent.com";
     Users users;
     FirebaseDatabase database;
     ProgressDialog loader;
