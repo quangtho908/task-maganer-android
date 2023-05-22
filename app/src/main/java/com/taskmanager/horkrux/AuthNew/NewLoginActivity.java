@@ -110,7 +110,7 @@ public class NewLoginActivity extends AppCompatActivity {
         if (firebaseUser.isEmailVerified() == true) {
 
             Toast.makeText(getApplicationContext(), "Logged in", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            startActivity(new Intent(getApplicationContext(), AdminPanelActivity.class));
             dialog.dismiss();
             finish();
         } else {
