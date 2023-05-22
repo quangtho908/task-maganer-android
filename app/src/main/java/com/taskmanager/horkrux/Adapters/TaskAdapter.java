@@ -6,10 +6,13 @@ import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.taskmanager.horkrux.Activites.AssignTaskActivity;
 import com.taskmanager.horkrux.Activites.SubmitTaskActivity;
 import com.taskmanager.horkrux.Models.Task;
@@ -72,6 +75,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.binding.startingDate.setText(tasks.get(position).getTaskAssigned());
         holder.binding.deadlineDate.setText(tasks.get(position).getTaskDeadline());
         holder.binding.priorityShow.setText(tasks.get(position).getTaskPriority());
+        // load avatar and set circle avatar
+        String urlAvatar = "https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg";
+        Glide.with(holder.itemView.getContext()).load(urlAvatar).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatar);
 
 
         if (from == null) {
