@@ -28,6 +28,7 @@ import com.taskmanager.horkrux.CommonUtils;
 import com.taskmanager.horkrux.Models.Count;
 import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.R;
+import com.taskmanager.horkrux.Workspace.WorkspacesActivity;
 import com.taskmanager.horkrux.databinding.ActivityMainBinding;
 import com.taskmanager.horkrux.databinding.NavHeaderMainBinding;
 import com.taskmanager.horkrux.ui.home.HomeFragment;
@@ -153,6 +154,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if (item.getItemId() == R.id.credits) {
                     startActivity(new Intent(MainActivity.this, AboutUs.class));
+                    return false;
+                }
+
+                if(item.getItemId() == R.id.nav_workspaces) {
+                    startActivity(new Intent(MainActivity.this, WorkspacesActivity.class));
                     return false;
                 }
 

@@ -114,8 +114,6 @@ public class HomeFragment extends Fragment {
 
     // loading user tasks
     void loadTask() {
-
-
         FirebaseDatabase.getInstance().getReference().child("all-tasks")
                 .child("user-tasks")
                 .child(currentUserId)
@@ -182,8 +180,6 @@ public class HomeFragment extends Fragment {
 
                     }
                 });
-
-
     }
 
 
