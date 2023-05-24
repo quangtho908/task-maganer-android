@@ -13,6 +13,10 @@
 
             android:fontFamily="@font/inter_medium"/>
         <item
+            android:id="@+id/nav_workspaces"
+            android:icon="@drawable/ic_menu"
+            android:title="Workspaces" />
+        <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_profile"
             android:title="@string/profile"

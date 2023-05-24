@@ -13,21 +13,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.taskmanager.horkrux.Activites.MainActivity;
 import com.taskmanager.horkrux.AdminPanel.AdminPanelActivity;
+import com.taskmanager.horkrux.Workspace.WorkspacesActivity;
 import com.taskmanager.horkrux.databinding.ActivityNewLoginBinding;
+import com.taskmanager.horkrux.databinding.NavHeaderMainBinding;
 
 public class NewLoginActivity extends AppCompatActivity {
 
     private ActivityNewLoginBinding binding;
-
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
     private ProgressDialog dialog;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,7 @@ public class NewLoginActivity extends AppCompatActivity {
         firebaseAuth.signInWithEmailAndPassword("marcus.codes.05@gmail.com", "12345678").addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
-                startActivity(new Intent(NewLoginActivity.this, AdminPanelActivity.class));
+                startActivity(new Intent(NewLoginActivity.this, MainActivity.class));
             }
         });
 
@@ -54,7 +55,7 @@ public class NewLoginActivity extends AppCompatActivity {
 
         //        if user is already logged in
         if (firebaseUser != null && firebaseUser.isEmailVerified()) {
-            startActivity(new Intent(getApplicationContext(), AdminPanelActivity.class));
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();
         }
 
@@ -110,7 +111,7 @@ public class NewLoginActivity extends AppCompatActivity {
         if (firebaseUser.isEmailVerified() == true) {
 
             Toast.makeText(getApplicationContext(), "Logged in", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(getApplicationContext(), AdminPanelActivity.class));
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
             dialog.dismiss();
             finish();
         } else {
