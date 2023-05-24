@@ -15,23 +15,15 @@
     <!--this the navigation view which draws
         and shows the navigation drawer-->
     <!--include the menu created in the menu folder-->
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@color/bg_color"
-        app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_main_drawer" />
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/currentActivity"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <FrameLayout
-            android:id="@+id/currentActivity"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/taskBar"
@@ -43,12 +35,12 @@
                 app:layout_constraintVertical_bias="0">
 
                 <ImageButton
-                    android:id="@+id/nav_draw_menu"
-                    android:layout_width="@dimen/_30sdp"
-                    android:layout_height="@dimen/_30sdp"
+                    android:id="@+id/back_button"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
                     android:layout_gravity="center|left"
                     android:layout_marginLeft="@dimen/_10sdp"
-                    android:background="@drawable/ic_menu" />
+                    android:background="@drawable/ic_back" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -64,33 +56,27 @@
                     android:layout_width="@dimen/_20sdp"
                     android:layout_height="@dimen/_20sdp"
                     android:layout_gravity="right|center"
-                    android:layout_marginRight="@dimen/_5sdp"
+                    android:layout_marginRight="13.000dp"
                     app:srcCompat="@drawable/ic_baseline_add_24" />
 
             </androidx.cardview.widget.CardView>
 
-        </FrameLayout>
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-<!--             vùng chưa list workspace-->
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/workspaces_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="5dp">
-<!--                Item workspace-->
-                <include layout="@layout/workspace_item" />
-                <include layout="@layout/workspace_item" />
-                <include layout="@layout/workspace_item" />
-                <include layout="@layout/workspace_item" />
-            </LinearLayout>
-        </ScrollView>
+                android:layout_height="match_parent" />
 
-    </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/bg_color"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_main_drawer" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
