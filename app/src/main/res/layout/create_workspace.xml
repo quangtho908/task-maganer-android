@@ -10,12 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Name workspace" />
-
     <EditText
         android:id="@+id/name_space"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nhập tên workspace"
+        android:hint="Enter name workspace"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="5dp"
         android:paddingHorizontal="@dimen/_10sdp"
