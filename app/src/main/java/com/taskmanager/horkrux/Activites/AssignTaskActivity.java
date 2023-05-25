@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.okhttp.internal.DiskLruCache;
 import com.taskmanager.horkrux.Adapters.UserAdapter;
 import com.taskmanager.horkrux.CommonUtils;
 import com.taskmanager.horkrux.Models.Task;
@@ -44,7 +45,7 @@ import retrofit2.Response;
 
 public class AssignTaskActivity extends AppCompatActivity {
     final Context context = AssignTaskActivity.this;
-    final String USER_TASK_PATH = "all-tasks/user-tasks";
+    final String USER_TASK_PATH = "workspaces/tasks";
     final String USERS_PATH = "Users";
     final String PROGRESS_MESSAGE = "Assigning Task";
 
@@ -67,7 +68,7 @@ public class AssignTaskActivity extends AppCompatActivity {
     public static ArrayList<Users> items;
     public static ArrayList<String> showingItems;
     private boolean isEdit = false;
-
+    private String workspaceId;
 
     private ProgressDialog progressDialog;
 
@@ -80,6 +81,7 @@ public class AssignTaskActivity extends AppCompatActivity {
 //        Objects.requireNonNull(getSupportActionBar()).hide();
 
         selectedTask = (Task) getIntent().getSerializableExtra("selectedTask");
+        workspaceId = getIntent().getSerializableExtra("workspaceId").toString();
         if (selectedTask != null) {
             isEdit = true;
         }
@@ -368,36 +370,33 @@ public class AssignTaskActivity extends AppCompatActivity {
 
     //load users from database
     private void loadUsers() {
-        database.getReference().child(USERS_PATH).addValueEventListener(new ValueEventListener() {
+        String path = "workspaces/" + workspaceId;
+        items.clear();
+        showingItems.clear();
+
+        database.getReference().child(path+ "/admins" ).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 try {
-                    items.clear();
-                    showingItems.clear();
-
-                    for (DataSnapshot snap : snapshot.getChildren()) {
-                        Users user = snap.getValue(Users.class);
-                        boolean add = true;
-                        for (Users users : assignedList) {
-                            if (users.getFireuserid().equals(user.getFireuserid())) {
-                                add = false;
-                                break;
-                            }
-                        }
-                        if (add) {
-                            items.add(user);
-                            showingItems.add(user.getUserName());
-                        }
-
-                    }
-
-
-                    userListAdapter.notifyDataSetChanged();
+                    addUser(snapshot);
                 } catch (Exception e) {
                     Log.d("TAG", "onDataChange: ");
                 }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+        database.getReference().child(path+ "/members" ).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                try {
+                    addUser(snapshot);
+                } catch (Exception e) {
+                    Log.d("TAG", "onDataChange: ");
+                }
             }
 
             @Override
@@ -412,6 +411,7 @@ public class AssignTaskActivity extends AppCompatActivity {
     AdapterView.OnItemClickListener userClicked = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            assignedList.clear();
             assignedList.add(items.get(position));
             items.remove(position);
             showingItems.remove(position);
@@ -474,5 +474,20 @@ public class AssignTaskActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
+    }
+
+    private void addUser (DataSnapshot snapshot) {
+
+        for (DataSnapshot snap : snapshot.getChildren()) {
+            Users user = snap.getValue(Users.class);
+            assert user != null;
+            if((assignedList.size() <= 0) || (user.getFireuserid() != assignedList.get(0).getFireuserid())) {
+                items.add(user);
+                showingItems.add(user.getUserName());
+            }
+
+        }
+
+        userListAdapter.notifyDataSetChanged();
     }
 }

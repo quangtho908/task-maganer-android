@@ -62,9 +62,13 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/workspaces_list"
+                android:id="@+id/workspace_list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="20dp"
+                android:layoutAnimation="@anim/layout_animation"
+                tools:listitem="@layout/workspace_item" />
 
         </LinearLayout>
 
