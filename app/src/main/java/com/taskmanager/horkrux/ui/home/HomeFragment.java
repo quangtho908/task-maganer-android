@@ -33,7 +33,6 @@ import java.util.Collections;
 
 public class HomeFragment extends Fragment {
 
-
     private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
     final String[] taskCategories = {"ALL Tasks", "TO-DO", "IN PROGRESS", "DONE"};
@@ -43,6 +42,8 @@ public class HomeFragment extends Fragment {
     private String currentUserId;
     private ArrayList<Task> userTasks;
     private Users user;
+    private String workspaceId;
+    private String from;
 
 
     public HomeFragment() {
@@ -50,6 +51,11 @@ public class HomeFragment extends Fragment {
 
     public HomeFragment(Users user) {
         this.user = user;
+    }
+
+    public HomeFragment(String workspaceId, String from) {
+        this.workspaceId = workspaceId;
+        this.from = from;
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -66,7 +72,7 @@ public class HomeFragment extends Fragment {
             binding.selectedUserView.setVisibility(View.VISIBLE);
             binding.selectedUserName.setText(user.getUserName());
 
-            taskAdapter = new TaskAdapter(getContext(), userTasks, "");
+            taskAdapter = new TaskAdapter(getContext(), userTasks, "", workspaceId);
             currentUserId = user.getFireuserid();
 
             binding.selectedUserName.setText(user.getUserName());
@@ -80,13 +86,17 @@ public class HomeFragment extends Fragment {
             params.setMargins(0, 200, 0, 0);
             binding.linearLayout.setLayoutParams(params);
 
-            taskAdapter = new TaskAdapter(getContext(), userTasks, null);
+            taskAdapter = new TaskAdapter(getContext(), userTasks, from, workspaceId);
 
             currentUserId = FirebaseAuth.getInstance().getUid();
         }
 
         setValues();
-        loadTask();
+        if(workspaceId != null) {
+            loadTaskWorkspace();
+        }else {
+            loadTask();
+        }
 
 
         return binding.getRoot();
@@ -179,6 +189,64 @@ public class HomeFragment extends Fragment {
                     public void onCancelled(@NonNull DatabaseError error) {
 
                     }
+                });
+    }
+
+    void loadTaskWorkspace() {
+        String path = "workspaces/" + workspaceId + "/tasks";
+        FirebaseDatabase.getInstance().getReference()
+                .child(path)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        userTasks.clear();
+                        int todo = 0;
+                        int inProgress = 0;
+                        int done = 0;
+                        int all;
+
+                        for (DataSnapshot snap : snapshot.getChildren()) {
+                            Task task = snap.getValue(Task.class);
+                            assert task != null;
+                            if (task.getTaskStatus().equals(Task.TODO)) {
+                                todo++;
+                            } else if (task.getTaskStatus().equals(Task.IN_PROGRESS)) {
+                                inProgress++;
+                            } else {
+                                done++;
+                            }
+                            userTasks.add(task);
+                        }
+                        Collections.reverse(userTasks);
+                        try {
+
+                            MainActivity.count.setTodo(todo);
+                            MainActivity.count.setInProgress(inProgress);
+                            MainActivity.count.setDone(done);
+                            MainActivity.count.setAll(done + todo + inProgress);
+                        } catch (Exception e) {
+
+                        }
+                        try {
+
+                            binding.homeProgress.setVisibility(View.GONE);
+
+                            if (userTasks.isEmpty()) {
+                                binding.taskEmptyMsg.setText("No tasks available");
+                                binding.taskEmptyMsg.setVisibility(View.VISIBLE);
+                            }
+                            else
+                            {
+                                binding.taskEmptyMsg.setVisibility(View.GONE);
+
+                            }
+                        } catch (Exception e) {
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
 

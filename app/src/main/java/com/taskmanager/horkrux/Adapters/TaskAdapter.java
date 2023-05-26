@@ -6,16 +6,14 @@ import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.taskmanager.horkrux.Activites.AssignTaskActivity;
 import com.taskmanager.horkrux.Activites.SubmitTaskActivity;
 import com.taskmanager.horkrux.Models.Task;
+import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.R;
 import com.taskmanager.horkrux.databinding.TaskLayoutBinding;
 
@@ -25,11 +23,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     private final Context context;
     private ArrayList<Task> tasks;
     private final String from;
+    private String workspaceId;
 
-    public TaskAdapter(Context context, ArrayList<Task> tasks, String from) {
+    public TaskAdapter(Context context, ArrayList<Task> tasks, String from, String workspaceId) {
         this.context = context;
         this.tasks = tasks;
         this.from = from;
+        this.workspaceId = workspaceId;
     }
 
     @NonNull
@@ -41,8 +41,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull TaskAdapter.TaskViewHolder holder, int position) {
-
-        String priority = tasks.get(position).getTaskPriority();
+        Task task = tasks.get(position);
+        String priority = task.getTaskPriority();
+        Users assignee = task.getGrpTask().get(0);
         if (priority.equals(Task.LOW)) {
             holder.binding.taskItem.setCardBackgroundColor(context.getResources().getColor(R.color.low_green));
             holder.binding.startingDate.setTextColor(context.getResources().getColor(R.color.dark_green));
@@ -76,8 +77,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.binding.deadlineDate.setText(tasks.get(position).getTaskDeadline());
         holder.binding.priorityShow.setText(tasks.get(position).getTaskPriority());
         // load avatar and set circle avatar
-        String urlAvatar = "https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg";
-        Glide.with(holder.itemView.getContext()).load(urlAvatar).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatar);
+
+//        String urlAvatar = "https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg";
+//        Glide.with(holder.itemView.getContext()).load(urlAvatar).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatarAssignee);
+        holder.binding.avatarAssignee.setVisibility(View.GONE);
+        holder.binding.textAssignee.setText(assignee.getUserName().substring(0, 1).toUpperCase());
 
 
         if (from == null) {
@@ -94,6 +98,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, AssignTaskActivity.class);
+                    if(workspaceId != null) {
+                        intent.putExtra("workspaceId", workspaceId);
+                    }
                     intent.putExtra("selectedTask", tasks.get(holder.getAdapterPosition()));
                     context.startActivity(intent);
                 }

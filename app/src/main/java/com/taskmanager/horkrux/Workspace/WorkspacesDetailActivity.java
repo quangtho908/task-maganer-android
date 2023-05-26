@@ -8,15 +8,19 @@ import android.widget.PopupMenu;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.taskmanager.horkrux.Activites.AssignTaskActivity;
 import com.taskmanager.horkrux.R;
 import com.taskmanager.horkrux.databinding.WorkspaceDetailBinding;
+import com.taskmanager.horkrux.ui.home.HomeFragment;
 
 public class WorkspacesDetailActivity extends AppCompatActivity {
     private WorkspaceDetailBinding binding ;
     private String currentName;
     private String currentId;
+    private HomeFragment homeFragment;
+    private FragmentTransaction fragmentTransaction;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +29,12 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
         currentId = getIntent().getSerializableExtra("currentId").toString();
         binding.workspaceName.setText(currentName);
         setContentView(binding.getRoot());
+
+        fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        homeFragment = new HomeFragment(currentId, "");
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.currentActivity, homeFragment);
+        transaction.commit();
 
         binding.backButton.setOnClickListener(new View.OnClickListener() {
             @Override

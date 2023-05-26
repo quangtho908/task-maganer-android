@@ -92,6 +92,7 @@
                 android:gravity="center">
 
                 <TextView
+                    android:id="@+id/text_assignee"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="N"
@@ -102,6 +103,7 @@
         // Avartar hình
 
         <FrameLayout
+            android:id="@+id/avatar_assignee"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center|right"
@@ -110,8 +112,9 @@
             android:clipToPadding="false"
             android:translationX="-50dp"
             android:translationY="-10dp">
+
             <ImageView
-                android:id="@+id/avatar"
+                android:id="@+id/avatar_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/circle_container"

@@ -26,7 +26,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.okhttp.internal.DiskLruCache;
 import com.taskmanager.horkrux.Adapters.UserAdapter;
 import com.taskmanager.horkrux.CommonUtils;
 import com.taskmanager.horkrux.Models.Task;
@@ -45,8 +44,7 @@ import retrofit2.Response;
 
 public class AssignTaskActivity extends AppCompatActivity {
     final Context context = AssignTaskActivity.this;
-    final String USER_TASK_PATH = "workspaces/tasks";
-    final String USERS_PATH = "Users";
+    final String USER_TASK_PATH = "workspaces/";
     final String PROGRESS_MESSAGE = "Assigning Task";
 
     private boolean isTaskSubmitted = false;
@@ -96,12 +94,12 @@ public class AssignTaskActivity extends AppCompatActivity {
     }
 
     private void setTasKUsingSelectedTask() {
+        binding.titleTask.setText(selectedTask.getTaskTitle());
         assignedList.addAll(selectedTask.getGrpTask());
         binding.taskTitle.setText(selectedTask.getTaskTitle());
         binding.taskDescription.setText(selectedTask.getTaskDescription());
         binding.startDate.setText(selectedTask.getTaskAssigned());
         binding.dueDate.setText(selectedTask.getTaskDeadline());
-        binding.taskTitle.setText(selectedTask.getTaskTitle());
 
         binding.textView.setVisibility(View.VISIBLE);
         binding.statusLayout.setVisibility(View.VISIBLE);
@@ -299,11 +297,8 @@ public class AssignTaskActivity extends AppCompatActivity {
 
     //add data to database
     synchronized private void addTaskToDatabase() {
-
-        for (Users user : task.getGrpTask()) {
-            String path = USER_TASK_PATH + "/" + user.getFireuserid() + "/" + task.getTaskID();
             database.getReference()
-                    .child(path)
+                    .child(USER_TASK_PATH + workspaceId + "/tasks/"+ task.getTaskID())
                     .setValue(task)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -325,10 +320,6 @@ public class AssignTaskActivity extends AppCompatActivity {
                     });
 
             progressDialog.dismiss();
-
-
-        }
-
 
     }
 
