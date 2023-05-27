@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.taskmanager.horkrux.databinding.WorkSpaceDetailBinding;
+import com.taskmanager.horkrux.databinding.WorkspaceDetailBinding;
 
 public class WorkspacesDetailActivity extends AppCompatActivity {
     private WorkSpaceDetailBinding binding ;
