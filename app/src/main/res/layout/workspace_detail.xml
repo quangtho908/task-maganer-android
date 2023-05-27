@@ -10,15 +10,10 @@
     tools:ignore="HardcodedText">
 
 
-
-
-    <!--this the navigation view which draws
-        and shows the navigation drawer-->
-    <!--include the menu created in the menu folder-->
     <FrameLayout
         android:id="@+id/currentActivity"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,41 +30,66 @@
                 app:layout_constraintVertical_bias="0">
 
                 <ImageButton
-                    android:id="@+id/back_button"
-                    android:layout_width="@dimen/_25sdp"
-                    android:layout_height="@dimen/_25sdp"
+                    android:id="@+id/nav_draw_menu"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
                     android:layout_gravity="center|left"
                     android:layout_marginLeft="@dimen/_10sdp"
-                    android:background="@drawable/ic_back" />
+                    android:background="@drawable/ic_menu" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:fontFamily="@font/inter_medium"
-                    android:text="Workspaces"
+                    android:text="Task Manager"
                     android:textColor="@color/title_text"
                     android:textSize="@dimen/_16ssp" />
 
                 <ImageView
-                    android:id="@+id/addWorkSpace"
+                    android:id="@+id/userNotifications"
                     android:layout_width="@dimen/_20sdp"
                     android:layout_height="@dimen/_20sdp"
                     android:layout_gravity="right|center"
-                    android:layout_marginRight="13.000dp"
-                    app:srcCompat="@drawable/ic_baseline_add_24" />
+                    android:layout_marginRight="@dimen/_5sdp"
+                    app:srcCompat="@drawable/ic_notification" />
 
             </androidx.cardview.widget.CardView>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/workspaces_list"
+            <FrameLayout
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_15sdp"
+                android:background="@drawable/border_round_category_task">
+
+                <Spinner
+                    android:id="@+id/taskCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/spinner_items"
+                    android:minHeight="55dp"
+                    android:paddingHorizontal="@dimen/_10sdp"
+                    android:paddingVertical="@dimen/_10sdp"
+                    android:popupBackground="@drawable/ic_arrow_down"
+
+                    android:spinnerMode="dropdown"
+                    android:visibility="visible"
+                    tools:visibility="visible" />
+            </FrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="10dp"
                 android:layout_height="match_parent" />
 
         </LinearLayout>
 
     </FrameLayout>
 
+    <!--this the navigation view which draws
+        and shows the navigation drawer-->
+    <!--include the menu created in the menu folder-->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navView"
         android:layout_width="wrap_content"

@@ -56,6 +56,9 @@
             android:name=".Activites.AssignTaskActivity"
             android:exported="true" />
         <activity
+            android:name=".Workspace.WorkspacesActivity"
+            android:exported="true" />
+        <activity
             android:name=".Authentication.LoginAndSignUp"
             android:exported="true"
             android:label="@string/app_name"
