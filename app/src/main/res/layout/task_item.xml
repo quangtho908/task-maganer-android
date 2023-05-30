@@ -112,8 +112,8 @@
             android:background="@drawable/circle_container"
             android:clipChildren="true"
             android:clipToPadding="false"
-            android:translationX="-50dp"
-            android:translationY="-10dp">
+            android:translationY="-10dp"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/avatar_image"

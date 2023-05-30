@@ -7,4 +7,7 @@
     <item
         android:id="@+id/create_task"
         android:title="Create Task" />
+    <item
+        android:id="@+id/delete_workspace"
+        android:title="Delete Workspace" />
 </menu>

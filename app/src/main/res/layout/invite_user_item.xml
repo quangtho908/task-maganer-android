@@ -20,24 +20,47 @@
             android:padding="@dimen/_10sdp">
 
             <FrameLayout
-                android:id="@+id/label_user"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/circle_container">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center">
+                <FrameLayout
+                    android:id="@+id/avatar_assignee"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/circle_container"
+                    android:clipChildren="true"
+                    android:clipToPadding="false">
 
-                    <TextView
-                        android:id="@+id/text_label"
+                    <ImageView
+                        android:id="@+id/avatar_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="N"
-                        android:textColor="@color/white" />
-                </LinearLayout>
+                        android:background="@drawable/circle_container"
+                        android:clipToOutline="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/place_holder" />
+                </FrameLayout>
 
+                <FrameLayout
+                    android:id="@+id/label_user"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/circle_container">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/text_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="N"
+                            android:textColor="@color/white" />
+                    </LinearLayout>
+
+                </FrameLayout>
             </FrameLayout>
 
             <FrameLayout

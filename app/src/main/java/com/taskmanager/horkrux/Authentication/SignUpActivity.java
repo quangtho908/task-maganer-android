@@ -1,4 +1,4 @@
-package com.taskmanager.horkrux.AuthNew;
+package com.taskmanager.horkrux.Authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,11 +19,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.R;
-import com.taskmanager.horkrux.databinding.ActivityNewSignUpBinding;
+import com.taskmanager.horkrux.databinding.ActivitySignUpBinding;
 
-public class NewSignUp extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity {
 
-    private ActivityNewSignUpBinding binding;
+    private ActivitySignUpBinding binding;
 
     final String[] deptCategory = {Users.ANDROID_DEPT, Users.WEB_DEPT, Users.UI_UX_DEPT, Users.MBA_DEPT};
     final int Android_Dev = 0, Web_Dev = 1, UI_UX = 2, MBA = 3;
@@ -38,7 +38,7 @@ public class NewSignUp extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityNewSignUpBinding.inflate(getLayoutInflater());
+        binding = ActivitySignUpBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         //firebase declarations
@@ -142,7 +142,7 @@ public class NewSignUp extends AppCompatActivity {
 
                 if (task.isSuccessful()) {
 //                    Toast.makeText(getApplicationContext(), "user is in database", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(NewSignUp.this, NewLoginActivity.class));
+                    startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
                     Log.d("result", "onComplete: " + task.getException());
                 } else {
                     Toast.makeText(getApplicationContext(), "user is not add in database", Toast.LENGTH_SHORT).show();

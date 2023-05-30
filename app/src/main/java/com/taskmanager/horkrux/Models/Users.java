@@ -1,11 +1,13 @@
 package com.taskmanager.horkrux.Models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Users implements Serializable {
 
 
     private String userName, userEmail, userPass, fireuserid, userDept, userProfile;
+    public ArrayList<String> workspaces;
     final public static String ANDROID_DEPT = "Android";
     final public static String WEB_DEPT = "Web";
     final public static String UI_UX_DEPT = "UI/UX";
@@ -29,6 +31,14 @@ public class Users implements Serializable {
 
     public Users() {
 
+    }
+
+    public ArrayList<String> getWorkspaces() {
+        return workspaces;
+    }
+
+    public void setWorkspaces(ArrayList<String> workspaces) {
+        this.workspaces = workspaces;
     }
 
     public String getUserDept() {

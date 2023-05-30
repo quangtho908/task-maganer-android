@@ -3,7 +3,6 @@ package com.taskmanager.horkrux.Adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.FirebaseDatabase;
 import com.taskmanager.horkrux.Activites.AssignTaskActivity;
-import com.taskmanager.horkrux.AdminPanel.SendNotificationsActivity;
 import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.R;
 import com.taskmanager.horkrux.databinding.UserItemBinding;
@@ -73,31 +70,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UsersViewHolde
         });
     }
     public void removeItem(int poi) {
-        if (from != null && !from.equals("SendNotification")) {
 
-//            Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
-            FirebaseDatabase.getInstance().getReference().child("all-tasks/user-tasks").child(users.get(poi).getFireuserid()).child(from).setValue(null);
-        }
-
-        if (from != null && from.equals("SendNotification")) {
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                SendNotificationsActivity.showingItems.add(users.get(poi).getUserName());
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                SendNotificationsActivity.items.add(users.remove(poi));
-            }
-        } else {
-            try {
-                AssignTaskActivity.showingItems.add(users.get(poi).getUserName());
-                AssignTaskActivity.items.add(users.remove(poi));
-            } catch (Exception e) {
-
-            }
-
-        }
-
-
+        try {
+            AssignTaskActivity.showingItems.add(users.get(poi).getUserName());
+            AssignTaskActivity.items.add(users.remove(poi));
+        } catch (Exception e) {}
         notifyItemRemoved(poi);
         notifyItemRangeChanged(poi, users.size());
     }

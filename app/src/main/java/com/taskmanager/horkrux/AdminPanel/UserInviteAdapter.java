@@ -10,21 +10,23 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.taskmanager.horkrux.Activites.AssignTaskActivity;
 import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.R;
-import com.taskmanager.horkrux.databinding.AdminUserListBinding;
+import com.taskmanager.horkrux.databinding.InviteUserItemBinding;
 
 import java.util.ArrayList;
 
-public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.AdminUserViewHolder> {
+public class UserInviteAdapter extends RecyclerView.Adapter<UserInviteAdapter.UserInviteViewHolder> {
     Context context;
     ArrayList<Users> users;
     ArrayList<Users> backUsers;
     String from;
 
 
-    public AdminUserAdapter(Context context, ArrayList<Users> users, String from) {
+    public UserInviteAdapter(Context context, ArrayList<Users> users, String from) {
         this.context = context;
         this.users = users;
         this.backUsers = users;
@@ -33,17 +35,23 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.Admi
 
     @NonNull
     @Override
-    public AdminUserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.admin_user_list, parent, false);
-        return new AdminUserViewHolder(view);
+    public UserInviteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.invite_user_item, parent, false);
+        return new UserInviteViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AdminUserViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull UserInviteViewHolder holder, int position) {
         Users user = users.get(position);
         holder.binding.username.setText(user.getUserName());
         holder.binding.email.setText(user.getUserEmail());
-//        holder.binding.textLabel.setText(user.getUserName().substring(0,1).toUpperCase());
+        if(user.getUserProfile().equals(Users.NO_PROFILE)) {
+            holder.binding.textLabel.setText(user.getUserName().substring(0,1).toUpperCase());
+            holder.binding.avatarAssignee.setVisibility(View.GONE);
+        }else {
+            Glide.with(holder.itemView.getContext()).load(user.getUserProfile()).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatarImage);
+            holder.binding.labelUser.setVisibility(View.GONE);
+        }
         holder.binding.userDetailSee.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,13 +81,13 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.Admi
         return users.size();
     }
 
-    public static class AdminUserViewHolder extends RecyclerView.ViewHolder {
+    public static class UserInviteViewHolder extends RecyclerView.ViewHolder {
 
-        AdminUserListBinding binding;
+        InviteUserItemBinding binding;
 
-        public AdminUserViewHolder(@NonNull View itemView) {
+        public UserInviteViewHolder(@NonNull View itemView) {
             super(itemView);
-            binding = AdminUserListBinding.bind(itemView);
+            binding = InviteUserItemBinding.bind(itemView);
         }
     }
 }

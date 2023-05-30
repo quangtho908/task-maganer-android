@@ -101,7 +101,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="24dp"
                 android:layoutAnimation="@anim/layout_animation"
-                tools:listitem="@layout/admin_user_list" />
+                tools:listitem="@layout/invite_user_item" />
 
         </LinearLayout>
     </FrameLayout>

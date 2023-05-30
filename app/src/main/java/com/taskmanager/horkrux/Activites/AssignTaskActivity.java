@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +31,7 @@ import com.taskmanager.horkrux.Adapters.UserAdapter;
 import com.taskmanager.horkrux.CommonUtils;
 import com.taskmanager.horkrux.Models.Task;
 import com.taskmanager.horkrux.Models.Users;
+import com.taskmanager.horkrux.Models.Workspace;
 import com.taskmanager.horkrux.Notification.ApiUtils;
 import com.taskmanager.horkrux.Notification.NotificationData;
 import com.taskmanager.horkrux.Notification.PushNotification;
@@ -63,6 +65,7 @@ public class AssignTaskActivity extends AppCompatActivity {
     private UserAdapter adapter;
     private ArrayAdapter userListAdapter;
     private ArrayList<Users> assignedList;
+    private ArrayList<String> assignedId;
     public static ArrayList<Users> items;
     public static ArrayList<String> showingItems;
     private boolean isEdit = false;
@@ -76,7 +79,6 @@ public class AssignTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityAssignTaskBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-//        Objects.requireNonNull(getSupportActionBar()).hide();
 
         selectedTask = (Task) getIntent().getSerializableExtra("selectedTask");
         workspaceId = getIntent().getSerializableExtra("workspaceId").toString();
@@ -89,13 +91,11 @@ public class AssignTaskActivity extends AppCompatActivity {
             setTasKUsingSelectedTask();
         }
         loadUsers();
-
-
     }
 
     private void setTasKUsingSelectedTask() {
         binding.titleTask.setText(selectedTask.getTaskTitle());
-        assignedList.addAll(selectedTask.getGrpTask());
+        assignedId.addAll(selectedTask.getGrpTask());
         binding.taskTitle.setText(selectedTask.getTaskTitle());
         binding.taskDescription.setText(selectedTask.getTaskDescription());
         binding.startDate.setText(selectedTask.getTaskAssigned());
@@ -140,6 +140,7 @@ public class AssignTaskActivity extends AppCompatActivity {
         startDatePicker = materialDateBuilder.build();
         dueDatePicker = materialDateBuilder.build();
         assignedList = new ArrayList<>();
+        assignedId = new ArrayList<>();
         items = new ArrayList<>();
         showingItems = new ArrayList<>();
         userList = new ListPopupWindow(context);
@@ -174,7 +175,7 @@ public class AssignTaskActivity extends AppCompatActivity {
         binding.backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                finishAndRemoveTask();
             }
         });
 
@@ -229,10 +230,11 @@ public class AssignTaskActivity extends AppCompatActivity {
             task.setTaskTitle(binding.taskTitle.getText().toString());
             task.setTaskDescription(binding.taskDescription.getText().toString());
             task.setTaskPriority(getSelectedPriority());
-            task.setGrpTask(assignedList);
+            task.setGrpTask(assignedId);
             task.setTaskAssigned(binding.startDate.getText().toString());
             task.setTaskDeadline(binding.dueDate.getText().toString());
             task.setTaskStatus(getStatus());
+            task.setWorkspaceId(workspaceId);
 
             //add task to database
             AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
@@ -244,7 +246,9 @@ public class AssignTaskActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int id) {
                             progressDialog.show();
                             addTaskToDatabase();
-                            CommonUtils.sendNotificationToUser(task, context);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                CommonUtils.sendNotificationToUser(task, context);
+                            }
                             isTaskSubmitted = true;
                         }
                     });
@@ -264,7 +268,7 @@ public class AssignTaskActivity extends AppCompatActivity {
     };
 
     private void sendNotificationToUser() {
-        String topic = "/topics/" + task.getGrpTask().get(0).getFireuserid();
+        String topic = "/topics/" + task.getGrpTask().get(0);
         NotificationData data = new NotificationData();
         data.setNotificationTitle(task.getTaskTitle());
         data.setNotificationMessage(task.getTaskDescription());
@@ -292,27 +296,26 @@ public class AssignTaskActivity extends AppCompatActivity {
 
     //add data to database
     synchronized private void addTaskToDatabase() {
-            database.getReference()
+
+        database.getReference()
                     .child(USER_TASK_PATH + workspaceId + "/tasks/"+ task.getTaskID())
                     .setValue(task)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         synchronized public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
-                            if (count == assignedList.size() - 1) {
-
-                                if (!isEdit) {
-
-                                    resetAllInputs();
-                                }
-                                Toast.makeText(context, "Task Assigned", Toast.LENGTH_SHORT).show();
-                            } else {
-
-                                count++;
+                            if (!isEdit) {
+                                resetAllInputs();
+                            }else {
+                                assignedList.clear();
+                                loadUsers();
                             }
-
-
+                            Toast.makeText(context, "Task Assigned", Toast.LENGTH_SHORT).show();
                         }
                     });
+
+            database.getReference()
+                    .child("tasks/" + task.getTaskID())
+                    .setValue(task);
 
             progressDialog.dismiss();
 
@@ -325,11 +328,11 @@ public class AssignTaskActivity extends AppCompatActivity {
         binding.mediumPriority.setChecked(false);
         binding.lowPriority.setChecked(false);
         assignedList.clear();
+        assignedId.clear();
         adapter.notifyDataSetChanged();
         binding.startDate.setText(null);
         binding.dueDate.setText(null);
         binding.taskTitle.requestFocus();
-
         loadUsers();
         count = 0;
 
@@ -355,14 +358,18 @@ public class AssignTaskActivity extends AppCompatActivity {
     };
 
     //load users from database
-    private void loadUsers() {
+    synchronized private void loadUsers() {
         String path = "workspaces/" + workspaceId;
         items.clear();
         showingItems.clear();
 
-        database.getReference().child(path+ "/admins" ).addValueEventListener(new ValueEventListener() {
+        database.getReference().child(path).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getValue(Workspace.class) == null) {
+                    finishAndRemoveTask();
+                    return;
+                }
                 try {
                     addUser(snapshot);
                 } catch (Exception e) {
@@ -375,22 +382,6 @@ public class AssignTaskActivity extends AppCompatActivity {
 
             }
         });
-        database.getReference().child(path+ "/members" ).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                try {
-                    addUser(snapshot);
-                } catch (Exception e) {
-                    Log.d("TAG", "onDataChange: ");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
     }
 
     //action when user from list is clicked
@@ -398,11 +389,13 @@ public class AssignTaskActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             assignedList.clear();
-            assignedList.add(items.get(position));
+            assignedId.clear();
+            assignedId.add(items.get(position).getFireuserid());
             items.remove(position);
             showingItems.remove(position);
             userList.dismiss();
             adapter.notifyDataSetChanged();
+            loadUsers();
         }
     };
 
@@ -472,18 +465,30 @@ public class AssignTaskActivity extends AppCompatActivity {
 
     }
 
-    private void addUser (DataSnapshot snapshot) {
-
-        for (DataSnapshot snap : snapshot.getChildren()) {
-            Users user = snap.getValue(Users.class);
-            assert user != null;
-            if((assignedList.size() <= 0) || (user.getFireuserid() != assignedList.get(0).getFireuserid())) {
-                items.add(user);
-                showingItems.add(user.getUserName());
-            }
-
+    synchronized private void addUser (DataSnapshot snapshot) {
+        Workspace workspace = snapshot.getValue(Workspace.class);
+        ArrayList<String> members = new ArrayList<>();
+        members.addAll(workspace.getAdmins());
+        if(workspace.getMembers() != null) {
+            members.addAll(workspace.getMembers());
         }
-
-        userListAdapter.notifyDataSetChanged();
+        for(String userId : members) {
+            database.getReference().child("Users/" + userId)
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            Users user = snapshot.getValue(Users.class);
+                            if((assignedId.size() <= 0) || !(user.getFireuserid().equals(assignedId.get(0)))) {
+                                items.add(user);
+                                showingItems.add(user.getUserName());
+                            }else {
+                                assignedList.add(user);
+                                adapter.notifyDataSetChanged();
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+        }
     }
 }

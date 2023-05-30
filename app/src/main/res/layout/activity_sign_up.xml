@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AuthNew.NewLoginActivity"
+    tools:context=".Authentication.SignUpActivity"
     android:background="@drawable/gradiant_bg">
 
 
     <ImageView
         android:id="@+id/signupImage"
-        android:layout_width="@dimen/_120sdp"
-        android:layout_height="@dimen/_120sdp"
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="@dimen/_100sdp"
         android:layout_marginTop="76dp"
         android:src="@drawable/ic_signinicon"
         app:layout_constraintBottom_toTopOf="@+id/signUpText"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:fontFamily="@font/inter_medium"
-        android:text="Log in"
+        android:text="Sign-up User"
         android:textColor="@color/white"
         android:textSize="@dimen/_14ssp"
         app:layout_constraintBottom_toTopOf="@+id/textView2"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:fontFamily="@font/inter_medium"
-        android:text="Log in with email and password"
+        android:text="Sign-up with email and password"
         android:textColor="@color/white"
         android:textSize="@dimen/_14ssp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
@@ -57,7 +57,7 @@
         android:background="@drawable/new_login_curve"
         android:orientation="vertical"
         android:paddingLeft="@dimen/_50sdp"
-        android:paddingTop="@dimen/_60sdp"
+        android:paddingTop="@dimen/_40sdp"
         android:paddingRight="@dimen/_30sdp"
         android:paddingBottom="@dimen/_10sdp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -65,14 +65,21 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent">
 
-<!--        <EditText-->
-<!--            android:id="@+id/loginEmail"-->
+<!--        <com.google.android.material.textfield.TextInputEditText-->
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="wrap_content"-->
-<!--            android:hint="Email id"-->
-<!--            android:textSize="@dimen/_16ssp"-->
-<!--            android:fontFamily="@font/inter_medium"-->
-<!--            />-->
+<!--            >-->
+
+<!--            <EditText-->
+<!--                android:id="@+id/createUserEmail"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:hint="Enter email"-->
+<!--                android:textSize="@dimen/_14ssp"-->
+<!--                android:fontFamily="@font/inter_medium"/>-->
+<!--            -->
+<!--        </com.google.android.material.textfield.TextInputEditText>-->
+
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -81,7 +88,7 @@
             >
 
             <EditText
-                android:id="@+id/loginEmail"
+                android:id="@+id/createUserEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Email"
@@ -96,34 +103,105 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/pass"
-            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_5sdp"
             app:passwordToggleEnabled="true"
             >
 
             <EditText
-                android:id="@+id/loginPassword"
+                android:id="@+id/createUserPass"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Password"
+                android:inputType="textPassword"
                 android:textSize="@dimen/_14ssp"
-                android:inputType="textEmailAddress"
+                android:backgroundTint="@color/white">
+
+            </EditText>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/username"
+            android:layout_marginTop="@dimen/_5sdp"
+            >
+
+            <EditText
+                android:id="@+id/crateUserName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Display Name"
+                android:textSize="@dimen/_14ssp"
+                android:inputType="textPersonName"
                 android:backgroundTint="@color/white">
 
             </EditText>
         </com.google.android.material.textfield.TextInputLayout>
 
 <!--        <EditText-->
-<!--            android:id="@+id/loginPassword"-->
+<!--            android:id="@+id/createUserPass"-->
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="wrap_content"-->
 <!--            android:layout_marginTop="@dimen/_10sdp"-->
 <!--            android:hint="Password"-->
-<!--            android:textSize="@dimen/_16ssp"-->
+<!--            android:textSize="@dimen/_14ssp"-->
+<!--            android:fontFamily="@font/inter_medium"/>-->
+
+<!--        <EditText-->
+<!--            android:id="@+id/crateUserName"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="@dimen/_10sdp"-->
+<!--            android:hint="Display Name"-->
 <!--            android:fontFamily="@font/inter_medium"-->
-<!--            />-->
+<!--            android:textSize="@dimen/_14ssp" />-->
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/TaskCategory"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_medium"
+            android:backgroundTint="@color/white"
+            >
+
+            <AutoCompleteTextView
+                android:id="@+id/createUserField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:inputType="none"
+                android:text="Select Field"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:fontFamily="@font/inter_medium"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+<!--        <com.google.android.material.textfield.TextInputLayout-->
+<!--            android:id="@+id/menu"-->
+<!--            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="@dimen/_10sdp"-->
+<!--            android:textSize="@dimen/_16ssp">-->
+
+<!--            <AutoCompleteTextView-->
+<!--                android:id="@+id/createUserField"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:inputType="none"-->
+<!--                android:hint="Select Field"-->
+<!--                android:textSize="@dimen/_16ssp"-->
+<!--                tools:ignore="SpeakableTextPresentCheck,SpeakableTextPresentCheck"-->
+<!--                />-->
+
+<!--        </com.google.android.material.textfield.TextInputLayout>-->
+
 
         <RelativeLayout
-            android:id="@+id/loginbutton"
+            android:id="@+id/createUserLoginButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -136,38 +214,15 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:fontFamily="@font/inter_medium"
-                android:text="Log in"
                 android:paddingBottom="@dimen/_5sdp"
+                android:text="Create User"
                 android:textColor="@color/white"
-                android:textSize="@dimen/_16ssp"
-                />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/signupbutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:background="@drawable/ic_nextbtn"
-            android:padding="@dimen/_5sdp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:fontFamily="@font/inter_medium"
-                android:paddingBottom="@dimen/_5sdp"
-                android:text="Sign Up"
-                android:textColor="@color/white"
-                android:textSize="@dimen/_16ssp" />
+                android:textSize="@dimen/_14ssp" />
 
         </RelativeLayout>
 
 
     </LinearLayout>
 
-    >
 
 </androidx.constraintlayout.widget.ConstraintLayout>

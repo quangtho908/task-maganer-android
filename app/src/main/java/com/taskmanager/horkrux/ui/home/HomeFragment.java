@@ -124,20 +124,23 @@ public class HomeFragment extends Fragment {
 
     // loading user tasks
     void loadTask() {
-        FirebaseDatabase.getInstance().getReference().child("all-tasks")
-                .child("user-tasks")
-                .child(currentUserId)
+        FirebaseDatabase.getInstance().getReference()
+                .child("tasks")
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        userTasks.clear();
                         int todo = 0;
                         int inProgress = 0;
                         int done = 0;
                         int all;
-                        userTasks.clear();
+
                         for (DataSnapshot snap : snapshot.getChildren()) {
                             Task task = snap.getValue(Task.class);
                             assert task != null;
+                            if(!FirebaseAuth.getInstance().getUid().equals(task.getGrpTask().get(0))) {
+                                continue;
+                            }
                             if (task.getTaskStatus().equals(Task.TODO)) {
                                 todo++;
                             } else if (task.getTaskStatus().equals(Task.IN_PROGRESS)) {
@@ -148,9 +151,6 @@ public class HomeFragment extends Fragment {
                             userTasks.add(task);
                         }
                         Collections.reverse(userTasks);
-
-//                        Toast.makeText(getContext(), "" + todo, Toast.LENGTH_SHORT).show();
-
                         try {
 
                             MainActivity.count.setTodo(todo);
@@ -160,12 +160,6 @@ public class HomeFragment extends Fragment {
                         } catch (Exception e) {
 
                         }
-
-
-//                        binding.selectedUserMail.setText("TODO : " + count[0] + "\n" + "IN PROGRESS : " + count[1] + "\n" + "DONE : " + count[2]);
-
-                        taskAdapter.notifyDataSetChanged();
-
                         try {
 
                             binding.homeProgress.setVisibility(View.GONE);
@@ -177,18 +171,12 @@ public class HomeFragment extends Fragment {
                             else
                             {
                                 binding.taskEmptyMsg.setVisibility(View.GONE);
-
                             }
-                        } catch (Exception e) {
-
-                        }
-
+                        } catch (Exception e) {}
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
+                    public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
 

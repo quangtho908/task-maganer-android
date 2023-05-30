@@ -6,12 +6,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.taskmanager.horkrux.Activites.AssignTaskActivity;
 import com.taskmanager.horkrux.AdminPanel.TeamMemberList;
+import com.taskmanager.horkrux.Models.Task;
+import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.R;
 import com.taskmanager.horkrux.databinding.WorkspaceDetailBinding;
 import com.taskmanager.horkrux.ui.home.HomeFragment;
@@ -22,12 +31,16 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
     private String currentId;
     private HomeFragment homeFragment;
     private FragmentTransaction fragmentTransaction;
+    private FirebaseDatabase database;
+    private FirebaseAuth auth;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = WorkspaceDetailBinding.inflate(getLayoutInflater());
         currentName = getIntent().getSerializableExtra("currentName").toString();
         currentId = getIntent().getSerializableExtra("currentId").toString();
+        database = FirebaseDatabase.getInstance();
+        auth = FirebaseAuth.getInstance();
         binding.workspaceName.setText(currentName);
         setContentView(binding.getRoot());
 
@@ -57,6 +70,11 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
                             startActivity(intent);
                             return true;
                         }
+                        if(menuItem.getItemId() == R.id.delete_workspace) {
+                            deleteWorkspace();
+                            finishAndRemoveTask();
+                            return true;
+                        }
                         return false;
                     }
                 });
@@ -76,5 +94,51 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
         transaction.commit();
     }
 
+    private void deleteWorkspace() {
+        database.getReference().child("workspaces/" + currentId)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshotWp) {
+                        snapshotWp.getRef().removeValue();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+
+        database.getReference().child("tasks")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot snap : snapshot.getChildren()) {
+                            if(snap.getValue(Task.class).getWorkspaceId().equals(currentId)) {
+                                snap.getRef().removeValue();
+                                break;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+
+        DatabaseReference workspaceUser = database.getReference().child("Users");
+        workspaceUser.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snap : snapshot.getChildren()) {
+                    Users user = snap.getValue(Users.class);
+                    if((user.getWorkspaces() != null) && user.getWorkspaces().contains(currentId)) {
+                        user.getWorkspaces().remove(currentId);
+                        workspaceUser.child(user.getFireuserid() + "/workspaces").setValue(user.getWorkspaces());
+                        return;
+                    }
+
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
 }
 ;

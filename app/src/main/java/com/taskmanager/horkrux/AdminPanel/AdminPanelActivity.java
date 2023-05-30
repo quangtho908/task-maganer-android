@@ -13,8 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.taskmanager.horkrux.Activites.AssignTaskActivity;
 import com.taskmanager.horkrux.Activites.MainActivity;
-import com.taskmanager.horkrux.AuthNew.NewLoginActivity;
-import com.taskmanager.horkrux.AuthNew.NewSignUp;
+import com.taskmanager.horkrux.Authentication.LoginActivity;
+import com.taskmanager.horkrux.Authentication.SignUpActivity;
 import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.R;
 import com.taskmanager.horkrux.databinding.ActivityAdminPanelBinding;
@@ -60,13 +60,13 @@ public class AdminPanelActivity extends AppCompatActivity {
                             return true;
                         }
                         if (menuItem.getItemId() == R.id.createUser) {
-                            startActivity(new Intent(context, NewSignUp.class));
+                            startActivity(new Intent(context, SignUpActivity.class));
                             return true;
                         }
 
                         if (menuItem.getItemId() == R.id.admin_logout) {
                             FirebaseAuth.getInstance().signOut();
-                            startActivity(new Intent(context, NewLoginActivity.class));
+                            startActivity(new Intent(context, LoginActivity.class));
                             finishAffinity();
                             Toast.makeText(context, "Logout success", Toast.LENGTH_SHORT).show();
                             return true;

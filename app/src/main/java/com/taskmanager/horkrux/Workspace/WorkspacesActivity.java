@@ -26,7 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.taskmanager.horkrux.CommonUtils;
 import com.taskmanager.horkrux.Models.Count;
-import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.Models.Workspace;
 import com.taskmanager.horkrux.R;
 import com.taskmanager.horkrux.databinding.CreateWorkspaceBinding;
@@ -34,8 +33,6 @@ import com.taskmanager.horkrux.databinding.NavHeaderMainBinding;
 import com.taskmanager.horkrux.databinding.WorkspaceListBinding;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class WorkspacesActivity extends AppCompatActivity {
     private WorkspaceListBinding binding;
@@ -65,7 +62,7 @@ public class WorkspacesActivity extends AppCompatActivity {
         binding.backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                finishAndRemoveTask();
             }
         });
         binding.addWorkSpace.setOnClickListener(new View.OnClickListener() {
@@ -108,7 +105,7 @@ public class WorkspacesActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 createWorkspace(String.valueOf(createWorkspaceBinding.nameSpace.getText()));
-                dialog.hide();
+                dialog.dismiss();
             }
         });
         dialog.show();
@@ -116,11 +113,11 @@ public class WorkspacesActivity extends AppCompatActivity {
 
     private void createWorkspace(String namespace) {
         Workspace workspace = new Workspace(namespace, CommonUtils.generateId(), auth.getUid());
-        Map<String, Users> admins = new HashMap<>();
+        ArrayList<String> admins = new ArrayList<String>();
         database.getReference().child(USER_PATH).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                admins.put(auth.getUid(), snapshot.getValue(Users.class));
+                admins.add(auth.getUid());
                 workspace.setAdmins(admins);
                 String path = WORKSPACE_PATH + workspace.getId();
                 database.getReference().child(path).setValue(workspace)

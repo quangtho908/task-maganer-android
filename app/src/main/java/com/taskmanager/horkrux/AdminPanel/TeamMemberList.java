@@ -25,7 +25,7 @@ public class TeamMemberList extends AppCompatActivity {
 
     private ActivityTeamMemberListBinding binding;
     private final Context context = TeamMemberList.this;
-    private AdminUserAdapter adapter;
+    private UserInviteAdapter adapter;
     private FirebaseDatabase database;
     private ArrayList<Users> users;
     String workspaceId;
@@ -40,12 +40,13 @@ public class TeamMemberList extends AppCompatActivity {
 
         users = new ArrayList<>();
         database = FirebaseDatabase.getInstance();
-        adapter = new AdminUserAdapter(context, users, null);
+        adapter = new UserInviteAdapter(context, users, null);
 
         binding.backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+
+                finishAndRemoveTask();
             }
         });
         binding.inviteUser.setOnClickListener(inviteUser);
@@ -92,11 +93,30 @@ public class TeamMemberList extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 users.clear();
                 Workspace workspace = snapshot.getValue(Workspace.class);
-                users.addAll(workspace.getAdmins().values());
-                if(workspace.getMembers() != null) {
-                    users.addAll(workspace.getMembers().values());
+                ArrayList<String> members = new ArrayList<>();
+                if(workspace == null) {
+                    finishAndRemoveTask();
+                    return;
                 }
-                adapter.notifyDataSetChanged();
+                members.addAll(workspace.getAdmins());
+                if(workspace.getMembers() != null) {
+                    members.addAll(workspace.getMembers());
+                }
+                for(String userId : members) {
+                    database.getReference().child("Users/" + userId)
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                       Users user = snapshot.getValue(Users.class);
+                                       users.add(user);
+                                       adapter.notifyDataSetChanged();
+
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {}
+                            });
+                }
+
                 binding.progressBar.setVisibility(View.GONE);
             }
 
@@ -108,15 +128,53 @@ public class TeamMemberList extends AppCompatActivity {
     }
 
     private void addMemberToWorkspace(Users user) {
-        database.getReference().child("workspaces/" + workspaceId + "/members/" + user.getFireuserid())
-                .setValue(user)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
+        database.getReference().child("workspaces/" + workspaceId)
+                .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()) {
-                            Toast.makeText(context, "Invite successful", Toast.LENGTH_SHORT).show();
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Workspace workspace = snapshot.getValue(Workspace.class);
+                        int posWp = 0;
+                        int posMb = 0;
+                        if(workspace == null) {
+                            finishAndRemoveTask();
+                            return;
                         }
+                        if(workspace.getMembers() != null) {
+                            posMb = workspace.getMembers().size();
+                            for(String id : workspace.getMembers()) {
+                                if(id.equals(user.getFireuserid())) {
+                                    Toast.makeText(context, "User is invited", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            }
+
+                            for(String workspaceId : user.getWorkspaces()) {
+                                if(workspaceId.equals(workspaceId)) {
+                                    Toast.makeText(context, "User is invited", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            }
+                        }
+                        if(user.getWorkspaces() != null) {
+                            posWp = user.getWorkspaces().size();
+                        }
+
+                        database.getReference().child("Users/" + user.getFireuserid() + "/workspaces/" + posWp)
+                                .setValue(workspaceId);
+                        database.getReference().child("workspaces/" + workspaceId + "/members/" + posMb)
+                                .setValue(user.getFireuserid())
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()) {
+                                            Toast.makeText(context, "Invite successful", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
                     }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
 }

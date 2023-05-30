@@ -1,12 +1,12 @@
 package com.taskmanager.horkrux.Models;
 
-import java.util.Map;
+import java.util.ArrayList;
 
 public class Workspace {
     private String id;
     private String name;
-    private Map<String, Users> members;
-    private Map<String, Users> admins;
+    private ArrayList<String> members;
+    private ArrayList<String> admins;
     private String createdBy;
     public Workspace() {
     }
@@ -33,11 +33,11 @@ public class Workspace {
         this.id = id;
     }
 
-    public Map<String, Users> getMembers() {
+    public ArrayList<String> getMembers() {
         return members;
     }
 
-    public Map<String, Users> getAdmins() {
+    public ArrayList<String> getAdmins() {
         return admins;
     }
 
@@ -45,11 +45,11 @@ public class Workspace {
         return createdBy;
     }
 
-    public void setMembers(Map<String, Users> members) {
+    public void setMembers(ArrayList<String> members) {
         this.members = members;
     }
 
-    public void setAdmins(Map<String, Users> admins) {
+    public void setAdmins(ArrayList<String> admins) {
         this.admins = admins;
     }
 

@@ -1,4 +1,4 @@
-package com.taskmanager.horkrux.AuthNew;
+package com.taskmanager.horkrux.Authentication;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -13,19 +13,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.taskmanager.horkrux.Activites.MainActivity;
-import com.taskmanager.horkrux.AdminPanel.AdminPanelActivity;
-import com.taskmanager.horkrux.Workspace.WorkspacesActivity;
-import com.taskmanager.horkrux.databinding.ActivityNewLoginBinding;
-import com.taskmanager.horkrux.databinding.NavHeaderMainBinding;
+import com.taskmanager.horkrux.databinding.ActivityLoginBinding;
 
-public class NewLoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
-    private ActivityNewLoginBinding binding;
+    private ActivityLoginBinding binding;
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
     private ProgressDialog dialog;
@@ -33,7 +29,7 @@ public class NewLoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityNewLoginBinding.inflate(getLayoutInflater());
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
 //        Initialization
@@ -47,7 +43,7 @@ public class NewLoginActivity extends AppCompatActivity {
         firebaseAuth.signInWithEmailAndPassword("marcus.codes.05@gmail.com", "12345678").addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
-                startActivity(new Intent(NewLoginActivity.this, MainActivity.class));
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
             }
         });
 
@@ -63,7 +59,7 @@ public class NewLoginActivity extends AppCompatActivity {
 
 
         binding.signupbutton.setOnClickListener(view -> {
-            startActivity(new Intent(this, NewSignUp.class));
+            startActivity(new Intent(this, SignUpActivity.class));
 
         });
         binding.loginbutton.setOnClickListener(new View.OnClickListener() {
