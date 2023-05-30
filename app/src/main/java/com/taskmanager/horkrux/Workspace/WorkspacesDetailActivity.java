@@ -1,16 +1,24 @@
 package com.taskmanager.horkrux.Workspace;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,13 +29,15 @@ import com.taskmanager.horkrux.Activites.AssignTaskActivity;
 import com.taskmanager.horkrux.AdminPanel.TeamMemberList;
 import com.taskmanager.horkrux.Models.Task;
 import com.taskmanager.horkrux.Models.Users;
+import com.taskmanager.horkrux.Models.Workspace;
 import com.taskmanager.horkrux.R;
+import com.taskmanager.horkrux.databinding.CreateWorkspaceBinding;
 import com.taskmanager.horkrux.databinding.WorkspaceDetailBinding;
 import com.taskmanager.horkrux.ui.home.HomeFragment;
 
 public class WorkspacesDetailActivity extends AppCompatActivity {
     private WorkspaceDetailBinding binding ;
-    private String currentName;
+    public static String currentName;
     private String currentId;
     private HomeFragment homeFragment;
     private FragmentTransaction fragmentTransaction;
@@ -37,13 +47,11 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = WorkspaceDetailBinding.inflate(getLayoutInflater());
-        currentName = getIntent().getSerializableExtra("currentName").toString();
         currentId = getIntent().getSerializableExtra("currentId").toString();
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
-        binding.workspaceName.setText(currentName);
         setContentView(binding.getRoot());
-
+        loadWorkspace();
         binding.backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { finish(); }
@@ -73,6 +81,11 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
                         if(menuItem.getItemId() == R.id.delete_workspace) {
                             deleteWorkspace();
                             finishAndRemoveTask();
+                            return true;
+                        }
+                        if(menuItem.getItemId() == R.id.rename_workspace) {
+                            dialogWorkspace();
+                            menu.dismiss();
                             return true;
                         }
                         return false;
@@ -139,6 +152,66 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
+    }
+
+    private void renameWorkspace(String newName) {
+        database.getReference().child("workspaces/" + currentId + "/name").setValue(newName)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                        Toast.makeText(WorkspacesDetailActivity.this, "Rename Successfully", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void dialogWorkspace() {
+        Dialog dialog = new Dialog(this);
+        CreateWorkspaceBinding createWorkspaceBinding = CreateWorkspaceBinding.inflate(getLayoutInflater());
+        dialog.setContentView(createWorkspaceBinding.getRoot());
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenWidth = displayMetrics.widthPixels;
+        int dialogWidth = (int) (screenWidth * 0.9);
+        int dialogHeight = ViewGroup.LayoutParams.WRAP_CONTENT;
+        Window window = dialog.getWindow();
+        window.setLayout(dialogWidth, dialogHeight);
+
+        createWorkspaceBinding.nameSpace.setText(binding.workspaceName.getText());
+        createWorkspaceBinding.nameSpace.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                createWorkspaceBinding.btnCreateWorkspace.setEnabled(charSequence.length() > 0);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+        createWorkspaceBinding.btnCreateWorkspace.setText("Rename");
+        createWorkspaceBinding.btnCreateWorkspace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                renameWorkspace(String.valueOf(createWorkspaceBinding.nameSpace.getText()));
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void loadWorkspace() {
+        database.getReference().child("workspaces/" + currentId)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Workspace workspace = snapshot.getValue(Workspace.class);
+                        binding.workspaceName.setText(workspace.getName());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
     }
 }
 ;

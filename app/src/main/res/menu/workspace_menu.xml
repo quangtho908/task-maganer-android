@@ -10,4 +10,7 @@
     <item
         android:id="@+id/delete_workspace"
         android:title="Delete Workspace" />
+    <item
+        android:id="@+id/rename_workspace"
+        android:title="Rename" />
 </menu>

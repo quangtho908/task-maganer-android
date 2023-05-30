@@ -43,7 +43,6 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Work
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, WorkspacesDetailActivity.class);
-                intent.putExtra("currentName", workspace.getName());
                 intent.putExtra("currentId", workspace.getId());
                 context.startActivity(intent);
             }
