@@ -147,7 +147,9 @@ public class AssignTaskActivity extends AppCompatActivity {
 
         if (isEdit) {
             adapter = new UserAdapter(AssignTaskActivity.this, assignedList, selectedTask.getTaskID());
+            binding.deleteTask.setOnClickListener(deleteTask);
         } else {
+            binding.deleteTask.setVisibility(View.GONE);
             adapter = new UserAdapter(AssignTaskActivity.this, assignedList, null);
         }
 
@@ -180,6 +182,14 @@ public class AssignTaskActivity extends AppCompatActivity {
         });
 
     }
+
+    View.OnClickListener deleteTask = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            deleteTask();
+            finishAndRemoveTask();
+        }
+    };
 
 
     // action on submit task
@@ -344,7 +354,6 @@ public class AssignTaskActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
 
-
             userList.setHeight(ListPopupWindow.WRAP_CONTENT);
             userList.setWidth(600);
             userList.setAnchorView(v);
@@ -463,6 +472,29 @@ public class AssignTaskActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
+    }
+
+    private void deleteTask() {
+        database.getReference().child("workspaces/" + workspaceId + "/tasks/" + selectedTask.getTaskID())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        snapshot.getRef().removeValue();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+        database.getReference().child("tasks/" + selectedTask.getTaskID())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        snapshot.getRef().removeValue();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
     }
 
     synchronized private void addUser (DataSnapshot snapshot) {

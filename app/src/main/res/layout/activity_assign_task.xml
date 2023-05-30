@@ -35,6 +35,16 @@
             android:textColor="@color/title_text"
             android:textSize="@dimen/_16ssp" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/delete_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            app:backgroundTint="#ED0D0D"
+            android:layout_gravity="center|right"
+            android:layout_marginRight="13dp"
+            app:srcCompat="@android:drawable/ic_menu_delete" />
+
     </androidx.cardview.widget.CardView>
 
     <ScrollView
