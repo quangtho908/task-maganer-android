@@ -1,62 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/userDetailSee"
     >
 
-    <RelativeLayout
-        android:id="@+id/linearLayout2"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="?selectableItemBackground">
+        tools:ignore="MissingConstraints">
 
-        <com.mikhaellopez.circularimageview.CircularImageView
-            android:id="@+id/profileImage"
-            android:layout_width="@dimen/_50sdp"
-            android:layout_height="@dimen/_50sdp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/_10sdp"
-            android:src="@drawable/profilephotocircle" />
-
-        <TextView
-            android:id="@+id/adminUserName"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/_10sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:layout_toRightOf="@+id/profileImage"
-            android:fontFamily="@font/inter_medium"
-            android:text="Prathamesh Sawant"
-            android:textColor="@color/title_text"
-            android:textSize="@dimen/_14ssp" />
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/_10sdp">
 
-        <TextView
-            android:id="@+id/text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/adminUserName"
-            android:layout_marginLeft="@dimen/_10sdp"
-            android:layout_toRightOf="@+id/profileImage"
-            android:text="See User Details"
-            android:ellipsize="end"
-            android:textColor="@color/desc_text"
-            android:textSize="@dimen/_12ssp" />
+            <FrameLayout
+                android:id="@+id/label_user"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/circle_container">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_1sdp"
-            android:background="@color/desc_text"
-            android:layout_below="@+id/profileImage"
-            android:layout_marginTop="@dimen/_5sdp"
-            android:layout_marginLeft="@dimen/_10sdp"
-            />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center">
 
-    </RelativeLayout>
+                    <TextView
+                        android:id="@+id/text_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="N"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_10sdp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/username"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_12ssp"/>
+
+                    <TextView
+                        android:id="@+id/email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:layout_marginTop="@dimen/_5sdp"/>
+                </LinearLayout>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

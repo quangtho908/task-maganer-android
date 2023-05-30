@@ -78,10 +78,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.binding.priorityShow.setText(tasks.get(position).getTaskPriority());
         // load avatar and set circle avatar
 
-//        String urlAvatar = "https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg";
-//        Glide.with(holder.itemView.getContext()).load(urlAvatar).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatarAssignee);
+        String urlAvatar = "https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg";
+//        Glide.with(holder.itemView.getContext()).load(urlAvatar).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatarImage);
         holder.binding.avatarAssignee.setVisibility(View.GONE);
-        holder.binding.textAssignee.setText(assignee.getUserName().substring(0, 1).toUpperCase());
+//        holder.binding.textAssignee.setVisibility(View.GONE);
+        holder.binding.textLabel.setText(assignee.getUserName().substring(0, 1).toUpperCase());
 
 
         if (from == null) {

@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.taskmanager.horkrux.Activites.AssignTaskActivity;
+import com.taskmanager.horkrux.AdminPanel.TeamMemberList;
 import com.taskmanager.horkrux.R;
 import com.taskmanager.horkrux.databinding.WorkspaceDetailBinding;
 import com.taskmanager.horkrux.ui.home.HomeFragment;
@@ -29,12 +30,6 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
         currentId = getIntent().getSerializableExtra("currentId").toString();
         binding.workspaceName.setText(currentName);
         setContentView(binding.getRoot());
-
-        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        homeFragment = new HomeFragment(currentId, "");
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.currentActivity, homeFragment);
-        transaction.commit();
 
         binding.backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,6 +51,12 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
                             startActivity(intent);
                             return true;
                         }
+                        if(menuItem.getItemId() == R.id.invite_user) {
+                            Intent intent = new Intent(WorkspacesDetailActivity.this, TeamMemberList.class);
+                            intent.putExtra("workspaceId", currentId);
+                            startActivity(intent);
+                            return true;
+                        }
                         return false;
                     }
                 });
@@ -64,5 +65,16 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        homeFragment = new HomeFragment(currentId, "");
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.currentActivity, homeFragment);
+        transaction.commit();
+    }
+
 }
 ;

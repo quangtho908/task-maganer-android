@@ -193,6 +193,7 @@ public class HomeFragment extends Fragment {
     }
 
     void loadTaskWorkspace() {
+
         String path = "workspaces/" + workspaceId + "/tasks";
         FirebaseDatabase.getInstance().getReference()
                 .child(path)

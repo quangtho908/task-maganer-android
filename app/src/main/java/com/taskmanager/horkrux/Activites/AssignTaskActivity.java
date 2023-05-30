@@ -100,10 +100,7 @@ public class AssignTaskActivity extends AppCompatActivity {
         binding.taskDescription.setText(selectedTask.getTaskDescription());
         binding.startDate.setText(selectedTask.getTaskAssigned());
         binding.dueDate.setText(selectedTask.getTaskDeadline());
-
-        binding.textView.setVisibility(View.VISIBLE);
-        binding.statusLayout.setVisibility(View.VISIBLE);
-
+        binding.actionTask.setText("Update Task");
         //setting priority
         if (selectedTask.getTaskPriority().equals(Task.LOW)) {
             binding.lowPriority.setChecked(true);
@@ -117,20 +114,13 @@ public class AssignTaskActivity extends AppCompatActivity {
 
         //setting status
         if (selectedTask.getTaskStatus().equals(Task.TODO)) {
-            binding.todoStatus.setCheckable(true);
             binding.todoStatus.setChecked(true);
-            binding.todoStatus.setCheckable(false);
-
         }
         if (selectedTask.getTaskStatus().equals(Task.IN_PROGRESS)) {
-            binding.inProgressStatus.setCheckable(true);
             binding.inProgressStatus.setChecked(true);
-            binding.inProgressStatus.setCheckable(false);
         }
         if (selectedTask.getTaskStatus().equals(Task.DONE)) {
-            binding.doneStatus.setCheckable(true);
             binding.doneStatus.setChecked(true);
-            binding.doneStatus.setCheckable(false);
         }
 
 
@@ -164,7 +154,6 @@ public class AssignTaskActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(context);
         progressDialog.setMessage(PROGRESS_MESSAGE);
 
-
         //date picker
         binding.startDate.setOnClickListener(startDatePick);
         binding.dueDate.setOnClickListener(dueDatePick);
@@ -177,6 +166,7 @@ public class AssignTaskActivity extends AppCompatActivity {
         binding.taskAssignTo.setLayoutManager(new GridLayoutManager(AssignTaskActivity.this, 2));
         binding.taskAssignTo.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+        binding.todoStatus.setChecked(true);
 
         //action on submit task btn
         binding.submitTask.setOnClickListener(assignTask);
@@ -203,6 +193,11 @@ public class AssignTaskActivity extends AppCompatActivity {
 
             if (binding.priorityGroup.getCheckedChipId() == -1) {
                 Toast.makeText(context, "Please select priority", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if(binding.statusGroupAdmin.getCheckedChipId() == -1){
+                Toast.makeText(context, "Please select status", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -237,7 +232,7 @@ public class AssignTaskActivity extends AppCompatActivity {
             task.setGrpTask(assignedList);
             task.setTaskAssigned(binding.startDate.getText().toString());
             task.setTaskDeadline(binding.dueDate.getText().toString());
-            task.setTaskStatus(Task.TODO);
+            task.setTaskStatus(getStatus());
 
             //add task to database
             AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
@@ -458,6 +453,16 @@ public class AssignTaskActivity extends AppCompatActivity {
             return "medium";
         } else {
             return "low";
+        }
+    }
+
+    private String getStatus() {
+        if(binding.todoStatus.isChecked()) {
+            return Task.TODO;
+        }else if(binding.inProgressStatus.isChecked()) {
+            return Task.IN_PROGRESS;
+        }else {
+            return Task.DONE;
         }
     }
 
