@@ -306,28 +306,21 @@ public class AssignTaskActivity extends AppCompatActivity {
 
     //add data to database
     synchronized private void addTaskToDatabase() {
-
-        database.getReference()
-                    .child(USER_TASK_PATH + workspaceId + "/tasks/"+ task.getTaskID())
+            database.getReference()
+                    .child("tasks/" + task.getTaskID())
                     .setValue(task)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        synchronized public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
-                            if (!isEdit) {
+                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                            if(!isEdit) {
                                 resetAllInputs();
                             }else {
                                 assignedList.clear();
                                 loadUsers();
                             }
-                            Toast.makeText(context, "Task Assigned", Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
                         }
                     });
-
-            database.getReference()
-                    .child("tasks/" + task.getTaskID())
-                    .setValue(task);
-
-            progressDialog.dismiss();
 
     }
 

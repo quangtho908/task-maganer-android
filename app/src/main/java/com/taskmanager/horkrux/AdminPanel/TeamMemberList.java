@@ -132,7 +132,6 @@ public class TeamMemberList extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Workspace workspace = snapshot.getValue(Workspace.class);
-                        int posWp = 0;
                         int posMb = 0;
                         if(workspace == null) {
                             finishAndRemoveTask();
@@ -146,20 +145,7 @@ public class TeamMemberList extends AppCompatActivity {
                                     return;
                                 }
                             }
-
-                            for(String workspaceId : user.getWorkspaces()) {
-                                if(workspaceId.equals(workspaceId)) {
-                                    Toast.makeText(context, "User is invited", Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                            }
                         }
-                        if(user.getWorkspaces() != null) {
-                            posWp = user.getWorkspaces().size();
-                        }
-
-                        database.getReference().child("Users/" + user.getFireuserid() + "/workspaces/" + posWp)
-                                .setValue(workspaceId);
                         database.getReference().child("workspaces/" + workspaceId + "/members/" + posMb)
                                 .setValue(user.getFireuserid())
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {

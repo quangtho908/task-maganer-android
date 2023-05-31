@@ -22,13 +22,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.taskmanager.horkrux.Activites.AssignTaskActivity;
 import com.taskmanager.horkrux.AdminPanel.TeamMemberList;
 import com.taskmanager.horkrux.Models.Task;
-import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.Models.Workspace;
 import com.taskmanager.horkrux.R;
 import com.taskmanager.horkrux.databinding.CreateWorkspaceBinding;
@@ -134,24 +132,6 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
-
-        DatabaseReference workspaceUser = database.getReference().child("Users");
-        workspaceUser.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot snap : snapshot.getChildren()) {
-                    Users user = snap.getValue(Users.class);
-                    if((user.getWorkspaces() != null) && user.getWorkspaces().contains(currentId)) {
-                        user.getWorkspaces().remove(currentId);
-                        workspaceUser.child(user.getFireuserid() + "/workspaces").setValue(user.getWorkspaces());
-                        return;
-                    }
-
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        });
     }
 
     private void renameWorkspace(String newName) {

@@ -182,7 +182,7 @@ public class HomeFragment extends Fragment {
 
     void loadTaskWorkspace() {
 
-        String path = "workspaces/" + workspaceId + "/tasks";
+        String path = "tasks";
         FirebaseDatabase.getInstance().getReference()
                 .child(path)
                 .addValueEventListener(new ValueEventListener() {
@@ -197,6 +197,9 @@ public class HomeFragment extends Fragment {
                         for (DataSnapshot snap : snapshot.getChildren()) {
                             Task task = snap.getValue(Task.class);
                             assert task != null;
+                            if(!task.getWorkspaceId().equals(workspaceId)){
+                                continue;
+                            }
                             if (task.getTaskStatus().equals(Task.TODO)) {
                                 todo++;
                             } else if (task.getTaskStatus().equals(Task.IN_PROGRESS)) {

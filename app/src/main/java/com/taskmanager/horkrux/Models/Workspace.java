@@ -7,6 +7,7 @@ public class Workspace {
     private String name;
     private ArrayList<String> members;
     private ArrayList<String> admins;
+    private ArrayList<String> tasks;
     private String createdBy;
     public Workspace() {
     }
@@ -55,5 +56,13 @@ public class Workspace {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public ArrayList<String> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(ArrayList<String> tasks) {
+        this.tasks = tasks;
     }
 }

@@ -113,7 +113,17 @@ public class UserInviteAdapter extends RecyclerView.Adapter<UserInviteAdapter.Us
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 if(menuItem.getItemId() == R.id.delete_user) {
-                    deleteInvite(user.getFireuserid());
+                    Thread thread = new Thread(() -> {
+                        deleteInvite(user.getFireuserid());
+                    });
+                    thread.start();
+                    boolean isStop = false;
+                    while (thread.isAlive() || !isStop) {
+                        if(!thread.isAlive()){
+                            deleteFromWp(user.getFireuserid());
+                            isStop = true;
+                        }
+                    }
                     notifyItemRemoved(position);
                     notifyItemRangeChanged(position, users.size());
                     return true;
@@ -126,6 +136,30 @@ public class UserInviteAdapter extends RecyclerView.Adapter<UserInviteAdapter.Us
     }
 
     private void deleteInvite(String userId){
+
+        DatabaseReference listTasks = FirebaseDatabase.getInstance().getReference("tasks");
+        listTasks.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ValueEventListener context = this;
+
+                for (DataSnapshot snap : snapshot.getChildren()) {
+                    Task task = snap.getValue(Task.class);
+                    if (task.getGrpTask().get(0).equals(userId)){
+                        listTasks.removeEventListener(context);
+                        listTasks.child(task.getTaskID() + "/grpTask/" + 0)
+                                .setValue(FirebaseAuth.getInstance().getUid());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+
+    private void deleteFromWp(String userId) {
         DatabaseReference inviteInWorkspace = FirebaseDatabase.getInstance().getReference("workspaces/" + from);
 
         DatabaseReference members = inviteInWorkspace.child("members");
@@ -152,64 +186,6 @@ public class UserInviteAdapter extends RecyclerView.Adapter<UserInviteAdapter.Us
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
-        DatabaseReference tasks = inviteInWorkspace.child("tasks");
-        tasks.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot snap : snapshot.getChildren()) {
-                    ValueEventListener context = this;
-                    Task task = snap.getValue(Task.class);
-                    if(task.getGrpTask().get(0).equals(userId)) {
-                        tasks.removeEventListener(context);
-                        tasks.child(task.getTaskID() + "/grpTask/" + 0).setValue(FirebaseAuth.getInstance().getUid());
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        });
-
-        DatabaseReference listTasks = FirebaseDatabase.getInstance().getReference("tasks");
-        listTasks.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ValueEventListener context = this;
-                for (DataSnapshot snap : snapshot.getChildren()) {
-                    Task task = snap.getValue(Task.class);
-                    if (task.getGrpTask().get(0).equals(userId)){
-                        listTasks.removeEventListener(context);
-                        listTasks.child(task.getTaskID() + "/grpTask/" + 0).setValue(FirebaseAuth.getInstance().getUid());
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        });
-
-        DatabaseReference userUpdate = FirebaseDatabase.getInstance().getReference("Users/" + userId);
-
-        userUpdate.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ValueEventListener context = this;
-                Users user = snapshot.getValue(Users.class);
-                if(user.getWorkspaces() == null) {
-                    userUpdate.removeEventListener(context);
-                    return;
-                }
-                if(user.getWorkspaces().contains(from)) {
-                    int index = user.getWorkspaces().indexOf(from);
-                    userUpdate.removeEventListener(context);
-
-                    userUpdate.child("workspaces/" + index).removeValue();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
