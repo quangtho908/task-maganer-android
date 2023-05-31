@@ -6,18 +6,21 @@ import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.taskmanager.horkrux.Activites.AssignTaskActivity;
-import com.taskmanager.horkrux.Activites.SubmitTaskActivity;
 import com.taskmanager.horkrux.Models.Task;
+import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.R;
-import com.taskmanager.horkrux.databinding.TaskLayoutBinding;
+import com.taskmanager.horkrux.databinding.TaskItemBinding;
 
 import java.util.ArrayList;
 
@@ -25,24 +28,26 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     private final Context context;
     private ArrayList<Task> tasks;
     private final String from;
+    private String workspaceId;
 
-    public TaskAdapter(Context context, ArrayList<Task> tasks, String from) {
+    public TaskAdapter(Context context, ArrayList<Task> tasks, String from, String workspaceId) {
         this.context = context;
         this.tasks = tasks;
         this.from = from;
+        this.workspaceId = workspaceId;
     }
 
     @NonNull
     @Override
     public TaskAdapter.TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.task_layout, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.task_item, parent, false);
         return new TaskAdapter.TaskViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TaskAdapter.TaskViewHolder holder, int position) {
-
-        String priority = tasks.get(position).getTaskPriority();
+        Task task = tasks.get(position);
+        String priority = task.getTaskPriority();
         if (priority.equals(Task.LOW)) {
             holder.binding.taskItem.setCardBackgroundColor(context.getResources().getColor(R.color.low_green));
             holder.binding.startingDate.setTextColor(context.getResources().getColor(R.color.dark_green));
@@ -76,31 +81,39 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.binding.deadlineDate.setText(tasks.get(position).getTaskDeadline());
         holder.binding.priorityShow.setText(tasks.get(position).getTaskPriority());
         // load avatar and set circle avatar
-        String urlAvatar = "https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg";
-        Glide.with(holder.itemView.getContext()).load(urlAvatar).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatar);
 
+        FirebaseDatabase.getInstance().getReference("Users/" + task.getGrpTask()
+                .get(0))
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Users assignee = snapshot.getValue(Users.class);
+                        if(assignee.getUserProfile().equals("No Profile")) {
+                            holder.binding.textLabel.setText(assignee.getUserName().substring(0, 1).toUpperCase());
+                            holder.binding.avatarAssignee.setVisibility(View.GONE);
+                        }else {
+                            Glide.with(holder.itemView.getContext()).load(assignee.getUserProfile()).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatarImage);
+                            holder.binding.avatarAssignee.setVisibility(View.VISIBLE);
+                            holder.binding.textAssignee.setVisibility(View.GONE);
+                        }
+                    }
 
-        if (from == null) {
-            holder.binding.taskItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, SubmitTaskActivity.class);
-                    intent.putExtra("selectedTask", tasks.get(holder.getAdapterPosition()));
-                    context.startActivity(intent);
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+        holder.binding.taskItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, AssignTaskActivity.class);
+                if(workspaceId != null) {
+                    intent.putExtra("workspaceId", workspaceId);
+                }else {
+                    intent.putExtra("workspaceId", task.getWorkspaceId());
                 }
-            });
-        } else {
-            holder.binding.taskItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, AssignTaskActivity.class);
-                    intent.putExtra("selectedTask", tasks.get(holder.getAdapterPosition()));
-                    context.startActivity(intent);
-                }
-            });
-        }
-
-
+                intent.putExtra("selectedTask", task);
+                context.startActivity(intent);
+            }
+        });
     }
 
 
@@ -115,7 +128,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
-        TaskLayoutBinding binding;
+        TaskItemBinding binding;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -6,10 +6,14 @@ import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.taskmanager.horkrux.Models.Task;
 import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.Notification.ApiUtils;
@@ -32,34 +36,41 @@ public class CommonUtils {
     @RequiresApi(api = Build.VERSION_CODES.O)
     static public void sendNotificationToUser(Task task, Context context) {
         database = FirebaseDatabase.getInstance();
-        for (Users user : task.getGrpTask()) {
-            String topic = "/topics/" + user.getFireuserid();
-            NotificationData data = new NotificationData();
-            data.setNotificationTitle(task.getTaskTitle());
-            data.setNotificationMessage(task.getTaskDescription());
-            data.setNotificationId(generateId());
-            data.setNotificationDate(getCurrentDateAndTime());
-//            showToast(context, data.getNotificationId());
-            PushNotification notification = new PushNotification(data, topic);
-            Log.d("NOTI", "sendNotificationToUser: " + data.getNotificationTitle());
+        for (String userId : task.getGrpTask()) {
+            database.getReference("Users/" + userId)
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            Users user = snapshot.getValue(Users.class);
+                            String topic = "/topics/" + user.getFireuserid();
+                            NotificationData data = new NotificationData();
+                            data.setNotificationTitle(task.getTaskTitle());
+                            data.setNotificationMessage(task.getTaskDescription());
+                            data.setNotificationId(generateId());
+                            data.setNotificationDate(getCurrentDateAndTime());
+                            PushNotification notification = new PushNotification(data, topic);
+                            Log.d("NOTI", "sendNotificationToUser: " + data.getNotificationTitle());
 
-            ApiUtils.getClient().sendNotification(notification).enqueue(new Callback<PushNotification>() {
-                @Override
-                public void onResponse(Call<PushNotification> call, Response<PushNotification> response) {
-                    if (response.isSuccessful()) {
-//                        Toast.makeText(context, "SUCCESS", Toast.LENGTH_SHORT).show();
-                        database.getReference().child(PATH).child(user.getFireuserid()).child(data.getNotificationId()).setValue(data);
-                    } else {
-//                        Toast.makeText(context, "fail", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                            ApiUtils.getClient().sendNotification(notification).enqueue(new Callback<PushNotification>() {
+                                @Override
+                                public void onResponse(Call<PushNotification> call, Response<PushNotification> response) {
+                                    if (response.isSuccessful()) {
+                                        database.getReference().child(PATH).child(user.getFireuserid()).child(data.getNotificationId()).setValue(data);
+                                    } else {
+                                    }
+                                }
 
-                @Override
-                public void onFailure(Call<PushNotification> call, Throwable t) {
-                    Toast.makeText(context, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                @Override
+                                public void onFailure(Call<PushNotification> call, Throwable t) {
+                                    Toast.makeText(context, t.getMessage(), Toast.LENGTH_SHORT).show();
 
-                }
-            });
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
         }
 
 

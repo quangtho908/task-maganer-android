@@ -20,6 +20,7 @@ public class Task implements Serializable {
     protected String taskAssignedTo;
     protected String taskAssignedFrom;
     protected String taskStatus;
+    protected String workspaceId;
 
     public String getTaskPriority() {
         return taskPriority;
@@ -30,7 +31,7 @@ public class Task implements Serializable {
     }
 
     protected String taskPriority;
-    protected ArrayList<Users> grpTask;
+    protected ArrayList<String> grpTask;
     protected boolean isSeen = false;
     protected Date taskAssignedDate;
     protected Date taskDeadlineDate;
@@ -38,7 +39,7 @@ public class Task implements Serializable {
     public Task() {
     }
 
-    public Task(String taskID, String taskTitle, String taskDescription, String taskAssigned, String taskDeadline, String taskAssignedTo, String taskAssignedFrom, String taskStatus, ArrayList<Users> grpTask, boolean isSeen, Date taskAssignedDate, Date taskDeadlineDate) {
+    public Task(String taskID, String taskTitle, String taskDescription, String taskAssigned, String taskDeadline, String taskAssignedTo, String taskAssignedFrom, String taskStatus, ArrayList<String> grpTask, boolean isSeen, Date taskAssignedDate, Date taskDeadlineDate) {
         this.taskID = taskID;
         this.taskTitle = taskTitle;
         this.taskDescription = taskDescription;
@@ -118,11 +119,11 @@ public class Task implements Serializable {
         this.taskStatus = taskStatus;
     }
 
-    public ArrayList<com.taskmanager.horkrux.Models.Users> getGrpTask() {
+    public ArrayList<String> getGrpTask() {
         return grpTask;
     }
 
-    public void setGrpTask(ArrayList<com.taskmanager.horkrux.Models.Users> grpTask) {
+    public void setGrpTask(ArrayList<String> grpTask) {
         this.grpTask = grpTask;
     }
 
@@ -148,5 +149,13 @@ public class Task implements Serializable {
 
     public void setTaskDeadlineDate(Date taskDeadlineDate) {
         this.taskDeadlineDate = taskDeadlineDate;
+    }
+
+    public String getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
     }
 }

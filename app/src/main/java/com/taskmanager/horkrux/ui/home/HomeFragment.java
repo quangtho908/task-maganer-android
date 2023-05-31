@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
@@ -32,9 +31,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class HomeFragment extends Fragment {
-
-
-    private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
     final String[] taskCategories = {"ALL Tasks", "TO-DO", "IN PROGRESS", "DONE"};
     final int ALL = 0, TODO = 1, IN_PROGRESS = 2, DONE = 3;
@@ -43,19 +39,25 @@ public class HomeFragment extends Fragment {
     private String currentUserId;
     private ArrayList<Task> userTasks;
     private Users user;
+    private String workspaceId;
+    private String from;
 
 
     public HomeFragment() {
     }
 
-    public HomeFragment(Users user) {
+    public HomeFragment(Users user, String workspaceId) {
+        this.workspaceId = workspaceId;
         this.user = user;
+    }
+
+    public HomeFragment(String workspaceId, String from) {
+        this.workspaceId = workspaceId;
+        this.from = from;
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         userTasks = new ArrayList<>();
@@ -66,7 +68,7 @@ public class HomeFragment extends Fragment {
             binding.selectedUserView.setVisibility(View.VISIBLE);
             binding.selectedUserName.setText(user.getUserName());
 
-            taskAdapter = new TaskAdapter(getContext(), userTasks, "");
+            taskAdapter = new TaskAdapter(getContext(), userTasks, "", workspaceId);
             currentUserId = user.getFireuserid();
 
             binding.selectedUserName.setText(user.getUserName());
@@ -80,13 +82,17 @@ public class HomeFragment extends Fragment {
             params.setMargins(0, 200, 0, 0);
             binding.linearLayout.setLayoutParams(params);
 
-            taskAdapter = new TaskAdapter(getContext(), userTasks, null);
+            taskAdapter = new TaskAdapter(getContext(), userTasks, from, workspaceId);
 
             currentUserId = FirebaseAuth.getInstance().getUid();
         }
 
         setValues();
-        loadTask();
+        if((workspaceId != null) && (user == null)) {
+            loadTaskWorkspace();
+        }else {
+            loadTask();
+        }
 
 
         return binding.getRoot();
@@ -114,20 +120,24 @@ public class HomeFragment extends Fragment {
 
     // loading user tasks
     void loadTask() {
-        FirebaseDatabase.getInstance().getReference().child("all-tasks")
-                .child("user-tasks")
-                .child(currentUserId)
+        FirebaseDatabase.getInstance().getReference()
+                .child("tasks")
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        userTasks.clear();
                         int todo = 0;
                         int inProgress = 0;
                         int done = 0;
                         int all;
-                        userTasks.clear();
+
                         for (DataSnapshot snap : snapshot.getChildren()) {
                             Task task = snap.getValue(Task.class);
                             assert task != null;
+                            String userId = (user == null) ? FirebaseAuth.getInstance().getUid() : user.getFireuserid();
+                            if(!userId.equals(task.getGrpTask().get(0))) {
+                                continue;
+                            }
                             if (task.getTaskStatus().equals(Task.TODO)) {
                                 todo++;
                             } else if (task.getTaskStatus().equals(Task.IN_PROGRESS)) {
@@ -138,9 +148,6 @@ public class HomeFragment extends Fragment {
                             userTasks.add(task);
                         }
                         Collections.reverse(userTasks);
-
-//                        Toast.makeText(getContext(), "" + todo, Toast.LENGTH_SHORT).show();
-
                         try {
 
                             MainActivity.count.setTodo(todo);
@@ -150,12 +157,65 @@ public class HomeFragment extends Fragment {
                         } catch (Exception e) {
 
                         }
+                        try {
 
+                            binding.homeProgress.setVisibility(View.GONE);
 
-//                        binding.selectedUserMail.setText("TODO : " + count[0] + "\n" + "IN PROGRESS : " + count[1] + "\n" + "DONE : " + count[2]);
+                            if (userTasks.isEmpty()) {
+                                binding.taskEmptyMsg.setText("No tasks available");
+                                binding.taskEmptyMsg.setVisibility(View.VISIBLE);
+                            }
+                            else
+                            {
+                                binding.taskEmptyMsg.setVisibility(View.GONE);
+                            }
+                        } catch (Exception e) {}
+                    }
 
-                        taskAdapter.notifyDataSetChanged();
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+    }
 
+    void loadTaskWorkspace() {
+
+        String path = "tasks";
+        FirebaseDatabase.getInstance().getReference()
+                .child(path)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        userTasks.clear();
+                        int todo = 0;
+                        int inProgress = 0;
+                        int done = 0;
+                        int all;
+
+                        for (DataSnapshot snap : snapshot.getChildren()) {
+                            Task task = snap.getValue(Task.class);
+                            assert task != null;
+                            if(!task.getWorkspaceId().equals(workspaceId)){
+                                continue;
+                            }
+                            if (task.getTaskStatus().equals(Task.TODO)) {
+                                todo++;
+                            } else if (task.getTaskStatus().equals(Task.IN_PROGRESS)) {
+                                inProgress++;
+                            } else {
+                                done++;
+                            }
+                            userTasks.add(task);
+                        }
+                        Collections.reverse(userTasks);
+                        try {
+
+                            MainActivity.count.setTodo(todo);
+                            MainActivity.count.setInProgress(inProgress);
+                            MainActivity.count.setDone(done);
+                            MainActivity.count.setAll(done + todo + inProgress);
+                        } catch (Exception e) {
+
+                        }
                         try {
 
                             binding.homeProgress.setVisibility(View.GONE);
@@ -172,13 +232,10 @@ public class HomeFragment extends Fragment {
                         } catch (Exception e) {
 
                         }
-
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
+                    public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
 

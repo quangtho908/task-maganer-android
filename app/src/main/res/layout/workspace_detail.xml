@@ -23,59 +23,39 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/taskBar"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_50sdp"
+                android:layout_height="65dp"
                 app:cardBackgroundColor="@color/bg_color"
                 app:cardElevation="0.1dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0">
 
                 <ImageButton
-                    android:id="@+id/nav_draw_menu"
-                    android:layout_width="@dimen/_30sdp"
-                    android:layout_height="@dimen/_30sdp"
+                    android:id="@+id/back_button"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
                     android:layout_gravity="center|left"
                     android:layout_marginLeft="@dimen/_10sdp"
-                    android:background="@drawable/ic_menu" />
+                    android:background="@drawable/ic_back" />
 
                 <TextView
+                    android:id="@+id/workspace_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:fontFamily="@font/inter_medium"
-                    android:text="Task Manager"
+                    android:text="Workspaces"
                     android:textColor="@color/title_text"
                     android:textSize="@dimen/_16ssp" />
 
                 <ImageView
-                    android:id="@+id/userNotifications"
+                    android:id="@+id/workspace_action"
                     android:layout_width="@dimen/_20sdp"
                     android:layout_height="@dimen/_20sdp"
                     android:layout_gravity="right|center"
-                    android:layout_marginRight="@dimen/_5sdp"
-                    app:srcCompat="@drawable/ic_notification" />
+                    android:layout_marginRight="13.000dp"
+                    app:srcCompat="@drawable/ic_baseline_more_vert_24" />
 
             </androidx.cardview.widget.CardView>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:background="@drawable/border_round_category_task">
-
-                <Spinner
-                    android:id="@+id/taskCategory"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:entries="@array/spinner_items"
-                    android:minHeight="55dp"
-                    android:paddingHorizontal="@dimen/_10sdp"
-                    android:paddingVertical="@dimen/_10sdp"
-                    android:popupBackground="@drawable/ic_arrow_down"
-
-                    android:spinnerMode="dropdown"
-                    android:visibility="visible"
-                    tools:visibility="visible" />
-            </FrameLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"

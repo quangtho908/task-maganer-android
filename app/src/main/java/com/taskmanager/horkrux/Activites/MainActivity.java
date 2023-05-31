@@ -2,7 +2,6 @@ package com.taskmanager.horkrux.Activites;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -22,8 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.taskmanager.horkrux.AuthNew.NewLoginActivity;
+import com.taskmanager.horkrux.Authentication.LoginActivity;
 import com.taskmanager.horkrux.CommonUtils;
 import com.taskmanager.horkrux.Models.Count;
 import com.taskmanager.horkrux.Models.Users;
@@ -48,40 +46,33 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private String USER_PATH;
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        homeFragment = new HomeFragment();
+
+        fragmentTransaction.replace(R.id.currentActivity, homeFragment);
+        fragmentTransaction.commit();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
         count = new Count(0, 0, 0, 0);
 
-        //subscribe to notification
         USER_PATH = "Users/" + auth.getUid() + "/";
-        String topic = "/topics/" + auth.getUid();
-        FirebaseMessaging.getInstance().subscribeToTopic(topic);
 
-//        getSupportActionBar().hide();
-//
-
-        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        homeFragment = new HomeFragment();
         drawerLayout = findViewById(R.id.my_drawer_layout);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
 
-
-        // pass the Open and Close toggle for the drawer layout listener
-        // to toggle the button
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.currentActivity, homeFragment);
-        transaction.commit();
-        // to make the Navigation drawer icon always appear on the action bar
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         binding.navDrawMenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,12 +81,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         binding.userNotifications.setOnClickListener(v -> {
             startActivity(new Intent(getApplicationContext(), ViewNotificationsActivity.class));
         });
         setNavigation();
-
 
     }
 
@@ -116,7 +105,9 @@ public class MainActivity extends AppCompatActivity {
                 Users user = snapshot.getValue(Users.class);
                 navHeaderMainBinding.loggedInUserName.setText(user.getUserName());
                 navHeaderMainBinding.loggedInUserMail.setText(user.getUserEmail());
-                Glide.with(MainActivity.this).load(user.getUserProfile()).placeholder(R.drawable.place_holder).into(navHeaderMainBinding.loggedInUserProfile);
+                if(!user.getUserProfile().equals(Users.NO_PROFILE)) {
+                    Glide.with(MainActivity.this).load(user.getUserProfile()).placeholder(R.drawable.place_holder).into(navHeaderMainBinding.loggedInUserProfile);
+                }
             }
 
             @Override
@@ -136,9 +127,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
                 if (item.getItemId() == R.id.nav_profile) {
-//                    fragment = new GalleryFragment();
                     Intent profileIntent = new Intent(MainActivity.this, Profile.class);
-//                    profileIntent.putExtra("count", count);
                     startActivity(profileIntent);
                     drawerLayout.closeDrawers();
                     return false;
@@ -146,14 +135,8 @@ public class MainActivity extends AppCompatActivity {
                 if (item.getItemId() == R.id.nav_sign_out) {
                     auth.signOut();
                     CommonUtils.showToast(getApplicationContext(), "Signed out");
-                    startActivity(new Intent(MainActivity.this, NewLoginActivity.class));
-
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
                     finishAffinity();
-                    return false;
-                }
-
-                if (item.getItemId() == R.id.credits) {
-                    startActivity(new Intent(MainActivity.this, AboutUs.class));
                     return false;
                 }
 
@@ -162,9 +145,8 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 }
 
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.currentActivity, fragment);
-                transaction.commit();
+                fragmentTransaction.replace(R.id.currentActivity, fragment);
+                fragmentTransaction.commit();
                 drawerLayout.closeDrawers();
 
                 return true;
@@ -180,18 +162,4 @@ public class MainActivity extends AppCompatActivity {
         actionBarDrawerToggle.onOptionsItemSelected(item);
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-//    @Override
-//    public boolean onSupportNavigateUp() {
-//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-//        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
-//                || super.onSupportNavigateUp();
-//    }
 }

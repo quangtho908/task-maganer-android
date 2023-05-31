@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +31,7 @@ import com.taskmanager.horkrux.Adapters.UserAdapter;
 import com.taskmanager.horkrux.CommonUtils;
 import com.taskmanager.horkrux.Models.Task;
 import com.taskmanager.horkrux.Models.Users;
+import com.taskmanager.horkrux.Models.Workspace;
 import com.taskmanager.horkrux.Notification.ApiUtils;
 import com.taskmanager.horkrux.Notification.NotificationData;
 import com.taskmanager.horkrux.Notification.PushNotification;
@@ -44,8 +46,7 @@ import retrofit2.Response;
 
 public class AssignTaskActivity extends AppCompatActivity {
     final Context context = AssignTaskActivity.this;
-    final String USER_TASK_PATH = "all-tasks/user-tasks";
-    final String USERS_PATH = "Users";
+    final String USER_TASK_PATH = "workspaces/";
     final String PROGRESS_MESSAGE = "Assigning Task";
 
     private boolean isTaskSubmitted = false;
@@ -64,10 +65,11 @@ public class AssignTaskActivity extends AppCompatActivity {
     private UserAdapter adapter;
     private ArrayAdapter userListAdapter;
     private ArrayList<Users> assignedList;
+    private ArrayList<String> assignedId;
     public static ArrayList<Users> items;
     public static ArrayList<String> showingItems;
     private boolean isEdit = false;
-
+    private String workspaceId;
 
     private ProgressDialog progressDialog;
 
@@ -77,9 +79,9 @@ public class AssignTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityAssignTaskBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-//        Objects.requireNonNull(getSupportActionBar()).hide();
 
         selectedTask = (Task) getIntent().getSerializableExtra("selectedTask");
+        workspaceId = getIntent().getSerializableExtra("workspaceId").toString();
         if (selectedTask != null) {
             isEdit = true;
         }
@@ -89,21 +91,16 @@ public class AssignTaskActivity extends AppCompatActivity {
             setTasKUsingSelectedTask();
         }
         loadUsers();
-
-
     }
 
     private void setTasKUsingSelectedTask() {
-        assignedList.addAll(selectedTask.getGrpTask());
+        binding.titleTask.setText(selectedTask.getTaskTitle());
+        assignedId.addAll(selectedTask.getGrpTask());
         binding.taskTitle.setText(selectedTask.getTaskTitle());
         binding.taskDescription.setText(selectedTask.getTaskDescription());
         binding.startDate.setText(selectedTask.getTaskAssigned());
         binding.dueDate.setText(selectedTask.getTaskDeadline());
-        binding.taskTitle.setText(selectedTask.getTaskTitle());
-
-        binding.textView.setVisibility(View.VISIBLE);
-        binding.statusLayout.setVisibility(View.VISIBLE);
-
+        binding.actionTask.setText("Update Task");
         //setting priority
         if (selectedTask.getTaskPriority().equals(Task.LOW)) {
             binding.lowPriority.setChecked(true);
@@ -117,20 +114,13 @@ public class AssignTaskActivity extends AppCompatActivity {
 
         //setting status
         if (selectedTask.getTaskStatus().equals(Task.TODO)) {
-            binding.todoStatus.setCheckable(true);
             binding.todoStatus.setChecked(true);
-            binding.todoStatus.setCheckable(false);
-
         }
         if (selectedTask.getTaskStatus().equals(Task.IN_PROGRESS)) {
-            binding.inProgressStatus.setCheckable(true);
             binding.inProgressStatus.setChecked(true);
-            binding.inProgressStatus.setCheckable(false);
         }
         if (selectedTask.getTaskStatus().equals(Task.DONE)) {
-            binding.doneStatus.setCheckable(true);
             binding.doneStatus.setChecked(true);
-            binding.doneStatus.setCheckable(false);
         }
 
 
@@ -150,20 +140,22 @@ public class AssignTaskActivity extends AppCompatActivity {
         startDatePicker = materialDateBuilder.build();
         dueDatePicker = materialDateBuilder.build();
         assignedList = new ArrayList<>();
+        assignedId = new ArrayList<>();
         items = new ArrayList<>();
         showingItems = new ArrayList<>();
         userList = new ListPopupWindow(context);
 
         if (isEdit) {
             adapter = new UserAdapter(AssignTaskActivity.this, assignedList, selectedTask.getTaskID());
+            binding.deleteTask.setOnClickListener(deleteTask);
         } else {
+            binding.deleteTask.setVisibility(View.GONE);
             adapter = new UserAdapter(AssignTaskActivity.this, assignedList, null);
         }
 
         userListAdapter = new ArrayAdapter(context, R.layout.user_list, showingItems);
         progressDialog = new ProgressDialog(context);
         progressDialog.setMessage(PROGRESS_MESSAGE);
-
 
         //date picker
         binding.startDate.setOnClickListener(startDatePick);
@@ -177,6 +169,7 @@ public class AssignTaskActivity extends AppCompatActivity {
         binding.taskAssignTo.setLayoutManager(new GridLayoutManager(AssignTaskActivity.this, 2));
         binding.taskAssignTo.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+        binding.todoStatus.setChecked(true);
 
         //action on submit task btn
         binding.submitTask.setOnClickListener(assignTask);
@@ -184,11 +177,19 @@ public class AssignTaskActivity extends AppCompatActivity {
         binding.backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                finishAndRemoveTask();
             }
         });
 
     }
+
+    View.OnClickListener deleteTask = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            deleteTask();
+            finishAndRemoveTask();
+        }
+    };
 
 
     // action on submit task
@@ -203,6 +204,11 @@ public class AssignTaskActivity extends AppCompatActivity {
 
             if (binding.priorityGroup.getCheckedChipId() == -1) {
                 Toast.makeText(context, "Please select priority", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if(binding.statusGroupAdmin.getCheckedChipId() == -1){
+                Toast.makeText(context, "Please select status", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -234,10 +240,11 @@ public class AssignTaskActivity extends AppCompatActivity {
             task.setTaskTitle(binding.taskTitle.getText().toString());
             task.setTaskDescription(binding.taskDescription.getText().toString());
             task.setTaskPriority(getSelectedPriority());
-            task.setGrpTask(assignedList);
+            task.setGrpTask(assignedId);
             task.setTaskAssigned(binding.startDate.getText().toString());
             task.setTaskDeadline(binding.dueDate.getText().toString());
-            task.setTaskStatus(Task.TODO);
+            task.setTaskStatus(getStatus());
+            task.setWorkspaceId(workspaceId);
 
             //add task to database
             AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
@@ -249,7 +256,9 @@ public class AssignTaskActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int id) {
                             progressDialog.show();
                             addTaskToDatabase();
-                            CommonUtils.sendNotificationToUser(task, context);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                CommonUtils.sendNotificationToUser(task, context);
+                            }
                             isTaskSubmitted = true;
                         }
                     });
@@ -269,7 +278,7 @@ public class AssignTaskActivity extends AppCompatActivity {
     };
 
     private void sendNotificationToUser() {
-        String topic = "/topics/" + task.getGrpTask().get(0).getFireuserid();
+        String topic = "/topics/" + task.getGrpTask().get(0);
         NotificationData data = new NotificationData();
         data.setNotificationTitle(task.getTaskTitle());
         data.setNotificationMessage(task.getTaskDescription());
@@ -297,36 +306,21 @@ public class AssignTaskActivity extends AppCompatActivity {
 
     //add data to database
     synchronized private void addTaskToDatabase() {
-
-        for (Users user : task.getGrpTask()) {
-            String path = USER_TASK_PATH + "/" + user.getFireuserid() + "/" + task.getTaskID();
             database.getReference()
-                    .child(path)
+                    .child("tasks/" + task.getTaskID())
                     .setValue(task)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        synchronized public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
-                            if (count == assignedList.size() - 1) {
-
-                                if (!isEdit) {
-
-                                    resetAllInputs();
-                                }
-                                Toast.makeText(context, "Task Assigned", Toast.LENGTH_SHORT).show();
-                            } else {
-
-                                count++;
+                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                            if(!isEdit) {
+                                resetAllInputs();
+                            }else {
+                                assignedList.clear();
+                                loadUsers();
                             }
-
-
+                            progressDialog.dismiss();
                         }
                     });
-
-            progressDialog.dismiss();
-
-
-        }
-
 
     }
 
@@ -337,11 +331,11 @@ public class AssignTaskActivity extends AppCompatActivity {
         binding.mediumPriority.setChecked(false);
         binding.lowPriority.setChecked(false);
         assignedList.clear();
+        assignedId.clear();
         adapter.notifyDataSetChanged();
         binding.startDate.setText(null);
         binding.dueDate.setText(null);
         binding.taskTitle.requestFocus();
-
         loadUsers();
         count = 0;
 
@@ -352,7 +346,6 @@ public class AssignTaskActivity extends AppCompatActivity {
     View.OnClickListener assignUserToTask = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
 
             userList.setHeight(ListPopupWindow.WRAP_CONTENT);
             userList.setWidth(600);
@@ -367,37 +360,23 @@ public class AssignTaskActivity extends AppCompatActivity {
     };
 
     //load users from database
-    private void loadUsers() {
-        database.getReference().child(USERS_PATH).addValueEventListener(new ValueEventListener() {
+    synchronized private void loadUsers() {
+        String path = "workspaces/" + workspaceId;
+        items.clear();
+        showingItems.clear();
+
+        database.getReference().child(path).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getValue(Workspace.class) == null) {
+                    finishAndRemoveTask();
+                    return;
+                }
                 try {
-                    items.clear();
-                    showingItems.clear();
-
-                    for (DataSnapshot snap : snapshot.getChildren()) {
-                        Users user = snap.getValue(Users.class);
-                        boolean add = true;
-                        for (Users users : assignedList) {
-                            if (users.getFireuserid().equals(user.getFireuserid())) {
-                                add = false;
-                                break;
-                            }
-                        }
-                        if (add) {
-                            items.add(user);
-                            showingItems.add(user.getUserName());
-                        }
-
-                    }
-
-
-                    userListAdapter.notifyDataSetChanged();
+                    addUser(snapshot);
                 } catch (Exception e) {
                     Log.d("TAG", "onDataChange: ");
                 }
-
-
             }
 
             @Override
@@ -405,18 +384,20 @@ public class AssignTaskActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     //action when user from list is clicked
     AdapterView.OnItemClickListener userClicked = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            assignedList.add(items.get(position));
+            assignedList.clear();
+            assignedId.clear();
+            assignedId.add(items.get(position).getFireuserid());
             items.remove(position);
             showingItems.remove(position);
             userList.dismiss();
             adapter.notifyDataSetChanged();
+            loadUsers();
         }
     };
 
@@ -470,9 +451,69 @@ public class AssignTaskActivity extends AppCompatActivity {
         }
     }
 
+    private String getStatus() {
+        if(binding.todoStatus.isChecked()) {
+            return Task.TODO;
+        }else if(binding.inProgressStatus.isChecked()) {
+            return Task.IN_PROGRESS;
+        }else {
+            return Task.DONE;
+        }
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
 
+    }
+
+    private void deleteTask() {
+        database.getReference().child("workspaces/" + workspaceId + "/tasks/" + selectedTask.getTaskID())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        snapshot.getRef().removeValue();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+        database.getReference().child("tasks/" + selectedTask.getTaskID())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        snapshot.getRef().removeValue();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+    }
+
+    synchronized private void addUser (DataSnapshot snapshot) {
+        Workspace workspace = snapshot.getValue(Workspace.class);
+        ArrayList<String> members = new ArrayList<>();
+        members.addAll(workspace.getAdmins());
+        if(workspace.getMembers() != null) {
+            members.addAll(workspace.getMembers());
+        }
+        for(String userId : members) {
+            database.getReference().child("Users/" + userId)
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            Users user = snapshot.getValue(Users.class);
+                            if((assignedId.size() <= 0) || !(user.getFireuserid().equals(assignedId.get(0)))) {
+                                items.add(user);
+                                showingItems.add(user.getUserName());
+                            }else {
+                                assignedList.add(user);
+                                adapter.notifyDataSetChanged();
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+        }
     }
 }

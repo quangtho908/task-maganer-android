@@ -49,15 +49,10 @@ public class Profile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-//        initialize
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
         USER_PATH = "Users/" + firebaseAuth.getUid() + "/";
-
-
-//        Toast.makeText(this,MainActivity.count.getTodo()+"" , Toast.LENGTH_SHORT).show();
         binding.todoCount.setText(String.valueOf(MainActivity.count.getTodo()));
         binding.inProgressCount.setText(String.valueOf(MainActivity.count.getInProgress()));
         binding.doneCount.setText(String.valueOf(MainActivity.count.getDone()));
