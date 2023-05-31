@@ -195,6 +195,10 @@ public class UserInviteAdapter extends RecyclerView.Adapter<UserInviteAdapter.Us
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Workspace workspace = snapshot.getValue(Workspace.class);
+                        if(workspace == null) {
+                            snapshot.getRef().removeEventListener(this);
+                            return;
+                        }
                         if(!workspace.getCreatedBy().equals(FirebaseAuth.getInstance().getUid())) {
                             binding.inviteAction.setVisibility(View.GONE);
                             return;
