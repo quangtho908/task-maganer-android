@@ -41,6 +41,8 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
     private FragmentTransaction fragmentTransaction;
     private FirebaseDatabase database;
     private FirebaseAuth auth;
+    private PopupMenu menu;
+    private boolean isNotAdmin = true;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +51,6 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
         setContentView(binding.getRoot());
-        loadWorkspace();
         binding.backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { finish(); }
@@ -58,9 +59,14 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
         binding.workspaceAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PopupMenu menu = new PopupMenu(WorkspacesDetailActivity.this, binding.workspaceAction);
+                menu = new PopupMenu(WorkspacesDetailActivity.this, binding.workspaceAction);
                 menu.getMenuInflater().inflate(R.menu.workspace_menu, menu.getMenu());
+                if(isNotAdmin) {
+                    menu.getMenu().getItem(0).setVisible(false);
+                    menu.getMenu().getItem(2).setVisible(false);
+                    menu.getMenu().getItem(3).setVisible(false);
 
+                }
                 menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
@@ -93,6 +99,7 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
                 menu.show();
             }
         });
+        loadWorkspace();
     }
 
     @Override
@@ -197,6 +204,9 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
                         if(workspace == null) {
                             finishAndRemoveTask();
                             return;
+                        }
+                        if(workspace.getCreatedBy().equals(auth.getUid())) {
+                            isNotAdmin = false;
                         }
                         binding.workspaceName.setText(workspace.getName());
                     }

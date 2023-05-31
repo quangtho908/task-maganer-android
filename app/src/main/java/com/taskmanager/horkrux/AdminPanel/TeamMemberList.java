@@ -146,6 +146,10 @@ public class TeamMemberList extends AppCompatActivity {
                                 }
                             }
                         }
+                        if(workspace.getCreatedBy().equals(user.getFireuserid())) {
+                            Toast.makeText(context, "User is invited", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         database.getReference().child("workspaces/" + workspaceId + "/members/" + posMb)
                                 .setValue(user.getFireuserid())
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {

@@ -153,6 +153,10 @@ public class WorkspacesActivity extends AppCompatActivity {
                             if(workspace.getCreatedBy().equals(auth.getUid())) {
                                 workspaces.add(workspace);
                             }
+
+                            if((workspace.getMembers() != null) && workspace.getMembers().contains(auth.getUid())){
+                                workspaces.add(workspace);
+                            }
                         }
                         workspaceAdapter.notifyDataSetChanged();
 
@@ -164,4 +168,5 @@ public class WorkspacesActivity extends AppCompatActivity {
                     }
                 });
     }
+
 }

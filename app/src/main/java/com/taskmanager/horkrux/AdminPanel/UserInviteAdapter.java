@@ -69,6 +69,7 @@ public class UserInviteAdapter extends RecyclerView.Adapter<UserInviteAdapter.Us
             public void onClick(View v) {
                 Intent intent = new Intent(context, UserTasksActivity.class);
                 intent.putExtra("selectedUser", users.get(holder.getAdapterPosition()));
+                intent.putExtra("workspaceId", from);
                 context.startActivity(intent);
 
             }

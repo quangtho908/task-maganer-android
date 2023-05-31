@@ -49,7 +49,8 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
     }
 
-    public HomeFragment(Users user) {
+    public HomeFragment(Users user, String workspaceId) {
+        this.workspaceId = workspaceId;
         this.user = user;
     }
 
@@ -92,7 +93,7 @@ public class HomeFragment extends Fragment {
         }
 
         setValues();
-        if(workspaceId != null) {
+        if((workspaceId != null) && (user == null)) {
             loadTaskWorkspace();
         }else {
             loadTask();
@@ -138,7 +139,8 @@ public class HomeFragment extends Fragment {
                         for (DataSnapshot snap : snapshot.getChildren()) {
                             Task task = snap.getValue(Task.class);
                             assert task != null;
-                            if(!FirebaseAuth.getInstance().getUid().equals(task.getGrpTask().get(0))) {
+                            String userId = (user == null) ? FirebaseAuth.getInstance().getUid() : user.getFireuserid();
+                            if(!userId.equals(task.getGrpTask().get(0))) {
                                 continue;
                             }
                             if (task.getTaskStatus().equals(Task.TODO)) {
