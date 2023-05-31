@@ -106,32 +106,40 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
     }
 
     private void deleteWorkspace() {
-        database.getReference().child("workspaces/" + currentId)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshotWp) {
-                        snapshotWp.getRef().removeValue();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {}
-                });
-
-        database.getReference().child("tasks")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot snap : snapshot.getChildren()) {
-                            if(snap.getValue(Task.class).getWorkspaceId().equals(currentId)) {
-                                snap.getRef().removeValue();
-                                break;
-                            }
+        Thread thread = new Thread(() -> {
+            database.getReference().child("workspaces/" + currentId)
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshotWp) {
+                            snapshotWp.getRef().removeValue();
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {}
-                });
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+        });
+        thread.start();
+        boolean isStop = false;
+        while (thread.isAlive() || !isStop) {
+            if(!thread.isAlive()){
+                database.getReference().child("tasks")
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot snap : snapshot.getChildren()) {
+                                    if(snap.getValue(Task.class).getWorkspaceId().equals(currentId)) {
+                                        snap.getRef().removeValue();
+                                        break;
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {}
+                        });
+                isStop = true;
+            }
+        }
     }
 
     private void renameWorkspace(String newName) {
@@ -186,6 +194,10 @@ public class WorkspacesDetailActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Workspace workspace = snapshot.getValue(Workspace.class);
+                        if(workspace == null) {
+                            finishAndRemoveTask();
+                            return;
+                        }
                         binding.workspaceName.setText(workspace.getName());
                     }
 
