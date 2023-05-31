@@ -8,9 +8,10 @@
     >
 
     <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints">
+        android:layout_width="377dp"
+        android:layout_height="69dp"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="13dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -64,12 +65,12 @@
             </FrameLayout>
 
             <FrameLayout
-                android:layout_width="match_parent"
+                android:layout_width="257dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_10sdp">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="257dp"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
@@ -79,16 +80,30 @@
                         android:layout_height="wrap_content"
                         android:text="TextView"
                         android:textColor="@color/black"
-                        android:textSize="@dimen/_12ssp"/>
+                        android:textSize="@dimen/_12ssp" />
 
                     <TextView
                         android:id="@+id/email"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="TextView"
-                        android:layout_marginTop="@dimen/_5sdp"/>
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:text="TextView" />
                 </LinearLayout>
 
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="35dp"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/invite_action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_gravity="right|center"
+                    android:layout_marginRight="13.000dp"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/ic_baseline_more_vert_24" />
             </FrameLayout>
 
         </LinearLayout>

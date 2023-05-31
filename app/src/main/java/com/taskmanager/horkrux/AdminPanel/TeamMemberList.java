@@ -30,7 +30,6 @@ public class TeamMemberList extends AppCompatActivity {
     private ArrayList<Users> users;
     String workspaceId;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +39,7 @@ public class TeamMemberList extends AppCompatActivity {
 
         users = new ArrayList<>();
         database = FirebaseDatabase.getInstance();
-        adapter = new UserInviteAdapter(context, users, null);
+        adapter = new UserInviteAdapter(context, users, workspaceId);
 
         binding.backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,6 +91,7 @@ public class TeamMemberList extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 users.clear();
+                adapter.notifyDataSetChanged();
                 Workspace workspace = snapshot.getValue(Workspace.class);
                 ArrayList<String> members = new ArrayList<>();
                 if(workspace == null) {
@@ -107,10 +107,9 @@ public class TeamMemberList extends AppCompatActivity {
                             .addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                       Users user = snapshot.getValue(Users.class);
-                                       users.add(user);
-                                       adapter.notifyDataSetChanged();
-
+                                    Users user = snapshot.getValue(Users.class);
+                                    users.add(user);
+                                    adapter.notifyDataSetChanged();
                                 }
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError error) {}
@@ -177,4 +176,5 @@ public class TeamMemberList extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
+
 }
