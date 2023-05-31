@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
@@ -32,8 +31,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class HomeFragment extends Fragment {
-
-    private HomeViewModel homeViewModel;
     private FragmentHomeBinding binding;
     final String[] taskCategories = {"ALL Tasks", "TO-DO", "IN PROGRESS", "DONE"};
     final int ALL = 0, TODO = 1, IN_PROGRESS = 2, DONE = 3;
@@ -61,8 +58,6 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         userTasks = new ArrayList<>();

@@ -13,9 +13,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TaskManager.NoActionBar">
         <activity
-            android:name=".Activites.AboutUs"
-            android:exported="false" />
-        <activity
             android:name=".Activites.ViewNotificationsActivity"
             android:exported="true"></activity>
         <activity
@@ -32,17 +29,11 @@
             android:name=".Authentication.SignUpActivity"
             android:exported="true"></activity>
         <activity
-            android:name=".AdminPanel.SendNotificationsActivity"
-            android:exported="false" />
-        <activity
             android:name=".AdminPanel.UserTasksActivity"
             android:exported="false" />
         <activity
             android:name=".AdminPanel.TeamMemberList"
             android:exported="false" />
-        <activity
-            android:name=".AdminPanel.AdminPanelActivity"
-            android:exported="true" />
         <activity
             android:name=".Activites.MainActivity"
             android:exported="true" />
