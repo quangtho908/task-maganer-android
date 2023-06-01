@@ -117,6 +117,7 @@ public class WorkspacesActivity extends AppCompatActivity {
         database.getReference().child(USER_PATH).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                admins.clear();
                 admins.add(auth.getUid());
                 workspace.setAdmins(admins);
                 String path = WORKSPACE_PATH + workspace.getId();

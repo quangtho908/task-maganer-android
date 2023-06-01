@@ -25,13 +25,12 @@ import com.taskmanager.horkrux.databinding.TaskItemBinding;
 import java.util.ArrayList;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
-    private final Context context;
+    private Context context;
     private ArrayList<Task> tasks;
     private final String from;
     private String workspaceId;
 
-    public TaskAdapter(Context context, ArrayList<Task> tasks, String from, String workspaceId) {
-        this.context = context;
+    public TaskAdapter(ArrayList<Task> tasks, String from, String workspaceId) {
         this.tasks = tasks;
         this.from = from;
         this.workspaceId = workspaceId;
@@ -40,6 +39,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     @NonNull
     @Override
     public TaskAdapter.TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        this.context = parent.getContext();
         View view = LayoutInflater.from(context).inflate(R.layout.task_item, parent, false);
         return new TaskAdapter.TaskViewHolder(view);
     }
@@ -92,8 +92,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                             holder.binding.textLabel.setText(assignee.getUserName().substring(0, 1).toUpperCase());
                             holder.binding.avatarAssignee.setVisibility(View.GONE);
                         }else {
-                            Glide.with(holder.itemView.getContext()).load(assignee.getUserProfile()).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatarImage);
                             holder.binding.avatarAssignee.setVisibility(View.VISIBLE);
+                            Glide.with(context).load(assignee.getUserProfile()).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatarImage);
                             holder.binding.textAssignee.setVisibility(View.GONE);
                         }
                     }

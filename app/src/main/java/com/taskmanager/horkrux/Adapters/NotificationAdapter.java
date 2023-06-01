@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -58,7 +59,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
                             String path = "Notifications/" + FirebaseAuth.getInstance().getUid() + "/" + id;
                             FirebaseDatabase.getInstance().getReference().child(path).setValue(null).addOnSuccessListener(unused -> {
-                                CommonUtils.showToast(context, "Notification Deleted");
+                                Toast.makeText(context, "Notification Deleted", Toast.LENGTH_SHORT).show();
                             });
 
                         }

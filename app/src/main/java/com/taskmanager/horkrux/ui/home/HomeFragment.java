@@ -68,7 +68,7 @@ public class HomeFragment extends Fragment {
             binding.selectedUserView.setVisibility(View.VISIBLE);
             binding.selectedUserName.setText(user.getUserName());
 
-            taskAdapter = new TaskAdapter(getContext(), userTasks, "", workspaceId);
+            taskAdapter = new TaskAdapter(userTasks, "", workspaceId);
             currentUserId = user.getFireuserid();
 
             binding.selectedUserName.setText(user.getUserName());
@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment {
             params.setMargins(0, 200, 0, 0);
             binding.linearLayout.setLayoutParams(params);
 
-            taskAdapter = new TaskAdapter(getContext(), userTasks, from, workspaceId);
+            taskAdapter = new TaskAdapter(userTasks, from, workspaceId);
 
             currentUserId = FirebaseAuth.getInstance().getUid();
         }

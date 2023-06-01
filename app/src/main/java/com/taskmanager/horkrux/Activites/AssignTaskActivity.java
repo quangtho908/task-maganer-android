@@ -32,17 +32,10 @@ import com.taskmanager.horkrux.CommonUtils;
 import com.taskmanager.horkrux.Models.Task;
 import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.Models.Workspace;
-import com.taskmanager.horkrux.Notification.ApiUtils;
-import com.taskmanager.horkrux.Notification.NotificationData;
-import com.taskmanager.horkrux.Notification.PushNotification;
 import com.taskmanager.horkrux.R;
 import com.taskmanager.horkrux.databinding.ActivityAssignTaskBinding;
 
 import java.util.ArrayList;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class AssignTaskActivity extends AppCompatActivity {
     final Context context = AssignTaskActivity.this;
@@ -277,33 +270,6 @@ public class AssignTaskActivity extends AppCompatActivity {
         }
     };
 
-    private void sendNotificationToUser() {
-        String topic = "/topics/" + task.getGrpTask().get(0);
-        NotificationData data = new NotificationData();
-        data.setNotificationTitle(task.getTaskTitle());
-        data.setNotificationMessage(task.getTaskDescription());
-        PushNotification notification = new PushNotification(data, topic);
-
-        ApiUtils.getClient().sendNotification(notification).enqueue(new Callback<PushNotification>() {
-            @Override
-            public void onResponse(Call<PushNotification> call, Response<PushNotification> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(context, "SUCCESS", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(context, "fail", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<PushNotification> call, Throwable t) {
-                Toast.makeText(context, t.getMessage(), Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-    }
-
-
     //add data to database
     synchronized private void addTaskToDatabase() {
             database.getReference()
@@ -504,8 +470,15 @@ public class AssignTaskActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             Users user = snapshot.getValue(Users.class);
                             if((assignedId.size() <= 0) || !(user.getFireuserid().equals(assignedId.get(0)))) {
+                                for(Users userItem : items) {
+                                    if(userItem.getFireuserid().equals(user.getFireuserid())) {
+                                       return;
+                                    }
+                                }
                                 items.add(user);
-                                showingItems.add(user.getUserName());
+                                if(!showingItems.contains(user.getUserName())) {
+                                    showingItems.add(user.getUserName());
+                                }
                             }else {
                                 assignedList.add(user);
                                 adapter.notifyDataSetChanged();

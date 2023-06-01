@@ -26,7 +26,6 @@ public class SignUpActivity extends AppCompatActivity {
     private ActivitySignUpBinding binding;
 
     final String[] deptCategory = {Users.ANDROID_DEPT, Users.WEB_DEPT, Users.UI_UX_DEPT, Users.MBA_DEPT};
-    final int Android_Dev = 0, Web_Dev = 1, UI_UX = 2, MBA = 3;
     private ArrayAdapter fieldCategoryAdapter;
 
     private FirebaseAuth firebaseAuth;
@@ -92,9 +91,6 @@ public class SignUpActivity extends AppCompatActivity {
                                 sendEmailVerification();
                                 user.setFireuserid(firebaseAuth.getUid());
                                 updateUser(user);
-//                                resetAttributes();
-
-
                             } else {
                                 Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
@@ -107,15 +103,6 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
     }
-
-    private void resetAttributes() {
-
-        binding.crateUserName.setText("");
-        binding.createUserEmail.setText(null);
-        binding.createUserPass.setText(null);
-        binding.createUserField.setText(null);
-    }
-
 
     //send verification email
     private void sendEmailVerification() {
@@ -141,7 +128,6 @@ public class SignUpActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
 
                 if (task.isSuccessful()) {
-//                    Toast.makeText(getApplicationContext(), "user is in database", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
                     Log.d("result", "onComplete: " + task.getException());
                 } else {
