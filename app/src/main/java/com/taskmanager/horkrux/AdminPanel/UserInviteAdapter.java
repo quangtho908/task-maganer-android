@@ -4,7 +4,6 @@ package com.taskmanager.horkrux.AdminPanel;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
@@ -14,15 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.taskmanager.horkrux.Activites.AssignTaskActivity;
-import com.taskmanager.horkrux.Models.Task;
 import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.Models.Workspace;
 import com.taskmanager.horkrux.R;
@@ -61,7 +57,7 @@ public class UserInviteAdapter extends RecyclerView.Adapter<UserInviteAdapter.Us
             holder.binding.textLabel.setText(user.getUserName().substring(0,1).toUpperCase());
             holder.binding.avatarAssignee.setVisibility(View.GONE);
         }else {
-            Glide.with(holder.itemView.getContext()).load(user.getUserProfile()).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatarImage);
+            Glide.with(holder.binding.avatarImage.getContext()).load(user.getUserProfile()).apply(RequestOptions.circleCropTransform()).into(holder.binding.avatarImage);
             holder.binding.labelUser.setVisibility(View.GONE);
         }
         holder.binding.userDetailSee.setOnClickListener(new View.OnClickListener() {

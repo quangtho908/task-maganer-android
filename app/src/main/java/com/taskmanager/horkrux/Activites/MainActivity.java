@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -22,7 +23,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.taskmanager.horkrux.Authentication.LoginActivity;
-import com.taskmanager.horkrux.CommonUtils;
 import com.taskmanager.horkrux.Models.Count;
 import com.taskmanager.horkrux.Models.Users;
 import com.taskmanager.horkrux.R;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 navHeaderMainBinding.loggedInUserName.setText(user.getUserName());
                 navHeaderMainBinding.loggedInUserMail.setText(user.getUserEmail());
                 if(!user.getUserProfile().equals(Users.NO_PROFILE)) {
-                    Glide.with(MainActivity.this).load(user.getUserProfile()).placeholder(R.drawable.place_holder).into(navHeaderMainBinding.loggedInUserProfile);
+                    Glide.with(getApplicationContext()).load(user.getUserProfile()).placeholder(R.drawable.place_holder).into(navHeaderMainBinding.loggedInUserProfile);
                 }
             }
 
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if (item.getItemId() == R.id.nav_sign_out) {
                     auth.signOut();
-                    CommonUtils.showToast(getApplicationContext(), "Signed out");
+                    Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
                     finishAffinity();
                     return false;

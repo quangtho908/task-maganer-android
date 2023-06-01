@@ -138,7 +138,7 @@ public class Profile extends AppCompatActivity {
                 binding.profileName.setText(user.getUserName());
                 binding.profileEmail.setText(user.getUserEmail());
                 binding.userProfileCategory.setText(user.getUserDept());
-                Glide.with(Profile.this).load(user.getUserProfile()).placeholder(R.drawable.place_holder).into(binding.profileImage);
+                Glide.with(getApplicationContext()).load(user.getUserProfile()).placeholder(R.drawable.place_holder).into(binding.profileImage);
             }
 
             @Override
